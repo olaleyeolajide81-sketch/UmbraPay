@@ -1,0 +1,24 @@
+{
+  "name": "umbrapay",
+  "version": "0.1.0",
+  "description": "UmbraPay — private payroll settlement on the Midnight network",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compact": "compact compile contracts/counter.compact managed/counter",
+    "test": "vitest run",
+    "test:compile": "npm run compact && vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@midnight-ntwrk/compact-runtime": "0.16.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": ["midnight", "blockchain", "zero-knowledge", "privacy", "payroll"]
+}

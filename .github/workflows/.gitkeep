@@ -1,0 +1,17 @@
+# CI/CD workflows land here in Level 3.
+#
+# This project already has everything CI will need to run:
+#   npm run compact    — compile the Compact contract
+#   npm run test       — run the test suite
+#   npm run typecheck  — typecheck the TypeScript glue
+#
+# Note for whoever wires this up: the Compact toolchain is NOT an npm package.
+# CI must install the devtools first and pin the version in .compact-version:
+#
+#   curl --proto '=https' --tlsv1.2 -LsSf \
+#     https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+#   source $HOME/.local/bin/env
+#   compact update "$(cat .compact-version)"
+#
+# See the Troubleshooting section of the README for the toolchain/runtime
+# version-lock that makes pinning mandatory.
