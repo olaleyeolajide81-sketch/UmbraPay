@@ -1,0 +1,34 @@
+# Local proof server for UmbraPay.
+#
+#   docker compose up -d     # start
+#   docker compose down      # stop
+#
+# The proof server generates the zero-knowledge proofs for every circuit call.
+# It is REQUIRED for deploying and for interacting with the deployed contract;
+# the unit tests in tests/ do NOT need it, because they run the circuits
+# in-process through compact-runtime.
+#
+# VERSION LOCK: pinned to 8.1.0 to match ledger-v8 8.1.0, which midnight-js
+# 4.1.1 pins client-side. A mismatched proof server will fail to prove against
+# contracts compiled by toolchain 0.31.1.
+#
+# Do not go down into the 7.x line: proof-server 7.x hangs during proof
+# generation on Apple Silicon under Docker Desktop.
+name: umbrapay-proof-server
+
+services:
+  proof-server:
+    image: midnightntwrk/proof-server:8.1.0
+    container_name: umbrapay-proof-server
+    command: ["midnight-proof-server -v"]
+    ports:
+      - "6300:6300"
+    environment:
+      RUST_BACKTRACE: "full"
+    healthcheck:
+      # The image is distroless, so the probe uses the shell's /dev/tcp redirect.
+      test: ["CMD-SHELL", "echo > /dev/tcp/127.0.0.1/6300"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
