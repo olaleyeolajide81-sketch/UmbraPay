@@ -43,7 +43,7 @@ import {
   sampleContractAddress,
 } from '@midnight-ntwrk/compact-runtime';
 import { Contract, type Ledger, ledger } from '../managed/counter/contract/index.js';
-import { type UmbraPayPrivateState, witnesses } from './witnesses.js';
+import { type UmbraPayPrivateState, witnesses } from '../src/witnesses.js';
 
 /** A stand-in Zswap coin public key; the contract does not spend coins in these tests. */
 const COIN_PUBLIC_KEY = '0'.repeat(64);
