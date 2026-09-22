@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="807" height="254" viewBox="0 0 807 254" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,monospace" font-size="13.5">
+  <defs>
+    <clipPath id="round"><rect x="0" y="0" width="807" height="254" rx="10"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="807" height="254" fill="#0d1117"/>
+    <rect width="807" height="34" fill="#161b22"/>
+    <line x1="0" y1="34" x2="807" y2="34" stroke="#30363d"/>
+    <circle cx="19" cy="17" r="6" fill="#ff5f56"/>
+    <circle cx="39" cy="17" r="6" fill="#ffbd2e"/>
+    <circle cx="59" cy="17" r="6" fill="#27c93f"/>
+    <text x="404" y="21" fill="#8b949e" text-anchor="middle" font-size="12">npm test — 16 passing</text>
+    <text x="18" y="62" fill="#3fb950">$ npm test</text>
+    <text x="18" y="82" fill="#c9d1d9"> RUN  v5.0.1 /workspaces/UmbraPay</text>
+    <text x="18" y="103" fill="#c9d1d9">Sourcemap for &quot;/workspaces/UmbraPay/managed/counter/contract/index.js&quot; points to missing source</text>
+    <text x="18" y="124" fill="#c9d1d9"> files</text>
+    <text x="18" y="145" fill="#3fb950"> ✓ tests/counter.test.ts (16 tests) 641ms</text>
+    <text x="18" y="166" fill="#3fb950"> Test Files  1 passed (1)</text>
+    <text x="18" y="187" fill="#3fb950">      Tests  16 passed (16)</text>
+    <text x="18" y="208" fill="#c9d1d9">   Start at  00:43:13</text>
+    <text x="18" y="229" fill="#d29922">   Duration  1000ms (tests 73%, transform 19%, import 7%)</text>
+  </g>
+  <rect x="0.5" y="0.5" width="806" height="253" rx="10" fill="none" stroke="#30363d"/>
+</svg>

@@ -1,6 +1,0 @@
-# The UmbraPay frontend lands here in Level 2.
-#
-# It will import the compiled contract from ../managed/counter/contract/index.js
-# and the witness implementations from ../tests/witnesses.js. Level 2 can lift
-# that witness module into this directory and re-export it, so that both the
-# tests and the UI share one definition of the private state.

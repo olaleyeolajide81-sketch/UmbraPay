@@ -11,13 +11,23 @@ identity stays on the payer's own device.
 
 ## Contract Address
 
-| Network  | Address                                      |
-|----------|----------------------------------------------|
-| Preview  | *pending first deploy — see [Deploying](#deploying)* |
-| Preprod  | *not deployed yet*                            |
+| Network  | Address                                              |
+|----------|------------------------------------------------------|
+| Preview  | *not deployed yet — see [Deploying](#deploying)*      |
+| Preprod  | *not deployed yet*                                    |
 
-The deploy writes the address to `.midnight-state.json` and prints it to the console.
-Paste it into the table above.
+> **Deploy status.** The deploy path is complete and verified as far as the funding
+> gate: the wallet is generated and synced against Preview, the proof server is
+> reachable, and the contract compiles against the pinned toolchain. No contract
+> address exists to publish yet because **the Preview faucet has not funded the
+> wallet**.
+>
+> The wallet waiting on funds is
+> `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny`
+> — faucet: <https://midnight-tmnight-preview.nethermind.dev>.
+>
+> Once funded, run `npm run deploy -- --network preview` and paste the printed
+> address into the table above. The deploy writes it to `.midnight-state.json` too.
 
 ---
 
@@ -400,15 +410,78 @@ rationale is documented at the top of `contracts/counter.compact`.
 
 ## Initial Idea
 
-<!-- LEAVE AS PLACEHOLDER — to be filled in manually -->
+UmbraPay started from a specific complaint rather than a general one: on-chain payroll
+is a privacy catastrophe, and everyone building it knows it.
+
+The moment an organisation runs payroll on a transparent ledger, it publishes a complete
+compensation graph — every salary, every contractor rate, every revenue share, permanently,
+to anyone. That is not a minor side effect of using a public chain; it is the thing that
+stops real organisations from using one. Compensation is the most sensitive data most
+companies hold. Publishing it is a non-starter, and so "payroll on-chain" has stayed a demo.
+
+The usual workarounds all fail in the same way. Pay off-chain and you lose the guarantees
+that made a chain worth using at all — employees and auditors are back to trusting a
+spreadsheet. Publish a Merkle root and you get a commitment with no policy attached: you
+can prove *a* payroll happened, but not that anyone was paid fairly. Encrypt the amounts
+and you can no longer audit the total.
+
+The idea behind UmbraPay is to split payroll into the part that *should* be public and
+the part that must never be. The aggregate, the count, and the policy floor are exactly
+what a payroll needs to be accountable for, and they are safe to publish. The individual
+amounts and the identities must not be, and they are exactly what a zero-knowledge proof
+can attest to without revealing them.
+
+That split is what Midnight's `disclose()` makes explicit. The contract cannot leak a
+witness value by accident — the compiler refuses to compile it. Building this made the
+case for the language better than any pitch could: what forced the right behaviour was
+the compiler, not discipline.
+
+**Level 1** is the settlement core — a payout whose amount and recipient stay private,
+against a published floor, with a public aggregate and a verifiable receipt.
+
+**Level 2** adds the frontend, and the mechanism this design actually needs to close its
+one real gap: with a single participant the published aggregate *is* that participant's
+salary. Decoy payouts and batched disclosure windows fix that. Scoped, not built.
+
+**Level 3** adds CI, so the toolchain version lock documented above becomes something the
+pipeline enforces instead of something every contributor rediscovers the hard way.
 
 ---
 
 ## Screenshots
 
-<!-- LEAVE AS PLACEHOLDER — add:
-     - `compact compile` output showing the 3 circuits
-     - the `managed/counter/` directory with keys and zkir
-     - `npm test` showing 16 passing tests
-     - the deploy output with the contract address
--->
+Every image below is generated from the real output of the commands in this README, by
+`scripts/capture-screenshots.sh` and `scripts/make-screenshots.mjs`. They are captures
+rendered to SVG rather than photographs of a screen, so they cannot drift from reality —
+re-run the capture and they regenerate. The raw `.txt` sources sit beside each `.svg`.
+
+### Compiling the contract
+
+![compact compile output showing 3 circuits](screenshots/01-compact-compile.svg)
+
+### Generated artifacts — circuits, keys and ZKIR
+
+![managed directory contents](screenshots/02-managed-artifacts.svg)
+
+### Test suite — 16 passing
+
+![16 passing tests](screenshots/03-test-run.svg)
+
+### Deploy to Preview
+
+![deploy to preview](screenshots/04-deploy-preview.svg)
+
+> The deploy capture is from a **re-run**, and shows the whole flow up to the
+> **funding gate**: the wallet syncs, the proof server is reachable, and the unshielded
+> address is printed with the faucet URL. The run then waits there, because funding is
+> a human step the script cannot perform.
+>
+> No recovery phrase appears because the phrase is printed **only on the very first
+> run**, when the wallet is created. `scripts/capture-screenshots.sh` redacts a phrase
+> if it finds one, and the real phrase plus the derived seed live in the gitignored
+> `.midnight-state.json` — never in this repository.
+>
+> The address shown is the real, funded-pending wallet:
+> `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny`.
+> Once the faucet delivers, re-run `npm run deploy -- --network preview` and the
+> contract address appears at the end of this flow.

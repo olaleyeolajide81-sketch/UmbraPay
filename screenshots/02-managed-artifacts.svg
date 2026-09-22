@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="515" height="485" viewBox="0 0 515 485" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,monospace" font-size="13.5">
+  <defs>
+    <clipPath id="round"><rect x="0" y="0" width="515" height="485" rx="10"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="515" height="485" fill="#0d1117"/>
+    <rect width="515" height="34" fill="#161b22"/>
+    <line x1="0" y1="34" x2="515" y2="34" stroke="#30363d"/>
+    <circle cx="19" cy="17" r="6" fill="#ff5f56"/>
+    <circle cx="39" cy="17" r="6" fill="#ffbd2e"/>
+    <circle cx="59" cy="17" r="6" fill="#27c93f"/>
+    <text x="258" y="21" fill="#8b949e" text-anchor="middle" font-size="12">managed/counter — generated circuits, keys and ZKIR</text>
+    <text x="18" y="62" fill="#3fb950">$ find managed/counter -type f | sort</text>
+    <text x="18" y="82" fill="#c9d1d9">managed/counter/compiler/contract-info.json</text>
+    <text x="18" y="103" fill="#c9d1d9">managed/counter/contract/index.d.ts</text>
+    <text x="18" y="124" fill="#c9d1d9">managed/counter/contract/index.js</text>
+    <text x="18" y="145" fill="#c9d1d9">managed/counter/contract/index.js.map</text>
+    <text x="18" y="166" fill="#c9d1d9">managed/counter/keys/commitPayout.prover</text>
+    <text x="18" y="187" fill="#c9d1d9">managed/counter/keys/commitPayout.verifier</text>
+    <text x="18" y="208" fill="#c9d1d9">managed/counter/keys/proveAboveFloor.prover</text>
+    <text x="18" y="229" fill="#c9d1d9">managed/counter/keys/proveAboveFloor.verifier</text>
+    <text x="18" y="250" fill="#c9d1d9">managed/counter/keys/remainingBudget.prover</text>
+    <text x="18" y="271" fill="#c9d1d9">managed/counter/keys/remainingBudget.verifier</text>
+    <text x="18" y="292" fill="#c9d1d9">managed/counter/zkir/commitPayout.bzkir</text>
+    <text x="18" y="313" fill="#c9d1d9">managed/counter/zkir/commitPayout.zkir</text>
+    <text x="18" y="334" fill="#c9d1d9">managed/counter/zkir/proveAboveFloor.bzkir</text>
+    <text x="18" y="354" fill="#c9d1d9">managed/counter/zkir/proveAboveFloor.zkir</text>
+    <text x="18" y="375" fill="#c9d1d9">managed/counter/zkir/remainingBudget.bzkir</text>
+    <text x="18" y="396" fill="#c9d1d9">managed/counter/zkir/remainingBudget.zkir</text>
+    <text x="18" y="417" fill="#c9d1d9"> </text>
+    <text x="18" y="438" fill="#3fb950">$ du -sh managed/</text>
+    <text x="18" y="459" fill="#c9d1d9">5.4M  managed/</text>
+  </g>
+  <rect x="0.5" y="0.5" width="514" height="484" rx="10" fill="none" stroke="#30363d"/>
+</svg>

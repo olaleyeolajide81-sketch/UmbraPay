@@ -1,0 +1,18 @@
+$ npm run deploy -- --network preview
+
+╔══════════════════════════════════════════════════════════════╗
+║  Deploy UmbraPay to preview
+╚══════════════════════════════════════════════════════════════╝
+  Payroll floor (public constructor arg): 1000
+─── Wallet setup ───────────────────────────────────────────────
+  Creating wallet...
+  Syncing with network...
+  ℹ  This may take several minutes depending on network size.
+     RPC disconnection messages during sync are normal and can be safely ignored.
+  Wallet Address: mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny
+  Balance: 0 tNight
+─── FUNDING REQUIRED ───────────────────────────────────────────
+  Wallet address: mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny
+  Faucet:         https://midnight-tmnight-preview.nethermind.dev
+  Waiting for tNIGHT to arrive (poll every 10s)...
+  ...still waiting (polling every 10s)

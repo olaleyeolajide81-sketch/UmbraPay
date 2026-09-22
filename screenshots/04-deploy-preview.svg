@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="782" height="443" viewBox="0 0 782 443" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,monospace" font-size="13.5">
+  <defs>
+    <clipPath id="round"><rect x="0" y="0" width="782" height="443" rx="10"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="782" height="443" fill="#0d1117"/>
+    <rect width="782" height="34" fill="#161b22"/>
+    <line x1="0" y1="34" x2="782" y2="34" stroke="#30363d"/>
+    <circle cx="19" cy="17" r="6" fill="#ff5f56"/>
+    <circle cx="39" cy="17" r="6" fill="#ffbd2e"/>
+    <circle cx="59" cy="17" r="6" fill="#27c93f"/>
+    <text x="391" y="21" fill="#8b949e" text-anchor="middle" font-size="12">npm run deploy -- --network preview</text>
+    <text x="18" y="62" fill="#3fb950">$ npm run deploy -- --network preview</text>
+    <text x="18" y="82" fill="#c9d1d9"> </text>
+    <text x="18" y="103" fill="#79c0ff">╔══════════════════════════════════════════════════════════════╗</text>
+    <text x="18" y="124" fill="#c9d1d9">║  Deploy UmbraPay to preview</text>
+    <text x="18" y="145" fill="#79c0ff">╚══════════════════════════════════════════════════════════════╝</text>
+    <text x="18" y="166" fill="#c9d1d9">  Payroll floor (public constructor arg): 1000</text>
+    <text x="18" y="187" fill="#c9d1d9">─── Wallet setup ───────────────────────────────────────────────</text>
+    <text x="18" y="208" fill="#c9d1d9">  Creating wallet...</text>
+    <text x="18" y="229" fill="#c9d1d9">  Syncing with network...</text>
+    <text x="18" y="250" fill="#c9d1d9">  ℹ  This may take several minutes depending on network size.</text>
+    <text x="18" y="271" fill="#c9d1d9">     RPC disconnection messages during sync are normal and can be safely ignored.</text>
+    <text x="18" y="292" fill="#c9d1d9">  Wallet Address: mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny</text>
+    <text x="18" y="313" fill="#c9d1d9">  Balance: 0 tNight</text>
+    <text x="18" y="334" fill="#c9d1d9">─── FUNDING REQUIRED ───────────────────────────────────────────</text>
+    <text x="18" y="354" fill="#c9d1d9">  Wallet address: mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny</text>
+    <text x="18" y="375" fill="#c9d1d9">  Faucet:         https://midnight-tmnight-preview.nethermind.dev</text>
+    <text x="18" y="396" fill="#c9d1d9">  Waiting for tNIGHT to arrive (poll every 10s)...</text>
+    <text x="18" y="417" fill="#c9d1d9">  ...still waiting (polling every 10s)</text>
+  </g>
+  <rect x="0.5" y="0.5" width="781" height="442" rx="10" fill="none" stroke="#30363d"/>
+</svg>

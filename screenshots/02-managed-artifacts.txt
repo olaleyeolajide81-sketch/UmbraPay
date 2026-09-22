@@ -1,0 +1,20 @@
+$ find managed/counter -type f | sort
+managed/counter/compiler/contract-info.json
+managed/counter/contract/index.d.ts
+managed/counter/contract/index.js
+managed/counter/contract/index.js.map
+managed/counter/keys/commitPayout.prover
+managed/counter/keys/commitPayout.verifier
+managed/counter/keys/proveAboveFloor.prover
+managed/counter/keys/proveAboveFloor.verifier
+managed/counter/keys/remainingBudget.prover
+managed/counter/keys/remainingBudget.verifier
+managed/counter/zkir/commitPayout.bzkir
+managed/counter/zkir/commitPayout.zkir
+managed/counter/zkir/proveAboveFloor.bzkir
+managed/counter/zkir/proveAboveFloor.zkir
+managed/counter/zkir/remainingBudget.bzkir
+managed/counter/zkir/remainingBudget.zkir
+
+$ du -sh managed/
+5.4M	managed/

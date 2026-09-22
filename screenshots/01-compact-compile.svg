@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="563" height="171" viewBox="0 0 563 171" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,monospace" font-size="13.5">
+  <defs>
+    <clipPath id="round"><rect x="0" y="0" width="563" height="171" rx="10"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="563" height="171" fill="#0d1117"/>
+    <rect width="563" height="34" fill="#161b22"/>
+    <line x1="0" y1="34" x2="563" y2="34" stroke="#30363d"/>
+    <circle cx="19" cy="17" r="6" fill="#ff5f56"/>
+    <circle cx="39" cy="17" r="6" fill="#ffbd2e"/>
+    <circle cx="59" cy="17" r="6" fill="#27c93f"/>
+    <text x="282" y="21" fill="#8b949e" text-anchor="middle" font-size="12">compact compile contracts/counter.compact managed/counter</text>
+    <text x="18" y="62" fill="#3fb950">$ compact compile contracts/counter.compact managed/counter</text>
+    <text x="18" y="82" fill="#d29922">Compiling 3 circuits:</text>
+    <text x="18" y="103" fill="#c9d1d9"> </text>
+    <text x="18" y="124" fill="#3fb950">$ compact compile --version</text>
+    <text x="18" y="145" fill="#c9d1d9">0.31.1</text>
+  </g>
+  <rect x="0.5" y="0.5" width="562" height="170" rx="10" fill="none" stroke="#30363d"/>
+</svg>

@@ -1,0 +1,5 @@
+$ compact compile contracts/counter.compact managed/counter
+Compiling 3 circuits:
+
+$ compact compile --version
+0.31.1
