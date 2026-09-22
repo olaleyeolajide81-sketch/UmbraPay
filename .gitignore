@@ -21,6 +21,8 @@ build/
 .midnight-wallet-state/
 # Local private state for the contract's witnesses.
 *-state/
+# LevelDB store the wallet/private-state providers create at deploy time.
+midnight-level-db/
 
 # ── Logs / coverage ──────────────────────────────────────────────────────────
 logs/

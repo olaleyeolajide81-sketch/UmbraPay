@@ -15,8 +15,8 @@ identity stays on the payer's own device.
 |---|---|
 | Level 1 settlement core (`contracts/counter.compact`) | ✅ Complete — 3 circuits, compiled artifacts committed for review |
 | Test suite | ✅ 16/16 passing (`npm test`) — circuit logic, state transitions, privacy guarantees |
-| Deploy tooling (Preview / Preprod) | ✅ Complete — verified up to the funding gate |
-| Contract address | ⏳ Pending — the Preview wallet is waiting on faucet funds |
+| Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview deployment |
+| Contract address | ✅ Deployed on Preview — `8c17…a5c`, see [Contract Address](#contract-address) |
 | Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
 | Level 3 (CI enforcing the toolchain version lock) | 🔭 Scoped, not built |
 
@@ -26,21 +26,20 @@ identity stays on the payer's own device.
 
 | Network  | Address                                              |
 |----------|------------------------------------------------------|
-| Preview  | *not deployed yet — see [Deploying](#deploying)*      |
+| Preview  | `8c1765ec101c02e4d4a024c7416185f9d619fcc296aebaf55b436159aed57a5c` |
 | Preprod  | *not deployed yet*                                    |
 
-> **Deploy status.** The deploy path is complete and verified as far as the funding
-> gate: the wallet is generated and synced against Preview, the proof server is
-> reachable, and the contract compiles against the pinned toolchain. No contract
-> address exists to publish yet because **the Preview faucet has not funded the
-> wallet**.
->
-> The wallet waiting on funds is
+> **Deploy status.** Deployed to **Preview** on 2026-09-22. The wallet was funded from
+> the Preview faucet, DUST was generated from its registered NIGHT UTXOs, and the
+> contract was proved and submitted through the pinned 0.31.1 toolchain. The deployer
+> wallet is
 > `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny`
-> — faucet: <https://midnight-tmnight-preview.nethermind.dev>.
+> and the address above is also recorded in the gitignored `.midnight-state.json`.
 >
-> Once funded, run `npm run deploy -- --network preview` and paste the printed
-> address into the table above. The deploy writes it to `.midnight-state.json` too.
+> Preprod has no deployment. One follows the same path:
+> `npm run address -- --network preprod`, fund at the
+> [Preprod faucet](https://midnight-tmnight-preprod.nethermind.dev), then
+> `npm run deploy -- --network preprod`.
 
 ---
 
@@ -494,7 +493,6 @@ re-run the capture and they regenerate. The raw `.txt` sources sit beside each `
 > if it finds one, and the real phrase plus the derived seed live in the gitignored
 > `.midnight-state.json` — never in this repository.
 >
-> The address shown is the real, funded-pending wallet:
-> `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny`.
-> Once the faucet delivers, re-run `npm run deploy -- --network preview` and the
-> contract address appears at the end of this flow.
+> The wallet was subsequently funded, and the next run completed the flow end to end —
+> the contract address it printed is now published in the
+> [Contract Address](#contract-address) table.
