@@ -9,6 +9,19 @@ identity stays on the payer's own device.
 
 ---
 
+## Project Status
+
+| Piece | State |
+|---|---|
+| Level 1 settlement core (`contracts/counter.compact`) | ✅ Complete — 3 circuits, compiled artifacts committed for review |
+| Test suite | ✅ 16/16 passing (`npm test`) — circuit logic, state transitions, privacy guarantees |
+| Deploy tooling (Preview / Preprod) | ✅ Complete — verified up to the funding gate |
+| Contract address | ⏳ Pending — the Preview wallet is waiting on faucet funds |
+| Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
+| Level 3 (CI enforcing the toolchain version lock) | 🔭 Scoped, not built |
+
+---
+
 ## Contract Address
 
 | Network  | Address                                              |
