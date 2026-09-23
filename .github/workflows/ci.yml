@@ -1,0 +1,117 @@
+name: CI
+
+# Level 3 of the project plan: make the toolchain/runtime version lock — the trap
+# documented in README.md → "The toolchain/runtime version lock" — something the
+# pipeline enforces, instead of something every contributor rediscovers the hard
+# way at deploy time.
+#
+# Two independent jobs, on purpose:
+#
+#   test     — typecheck plus the 16-test suite. It runs the committed contract
+#              in-process through compact-runtime, so it needs NO Docker, NO
+#              proof server, NO wallet and NO network. This is the job that
+#              should gate a pull request.
+#
+#   contract — installs the Compact devtools, installs the toolchain version
+#              pinned in .compact-version, and recompiles contracts/counter.compact
+#              from source. It then fails the build if (a) the committed
+#              managed/ artifacts are not byte-for-byte reproducible, or (b) the
+#              compiler emits a runtime version that disagrees with the
+#              compact-runtime pin in package.json. That second check is the real
+#              trap: a newer toolchain emits checkRuntimeVersion('0.19.0'), which
+#              midnight-js 4.1.1 (compact-runtime 0.16.0) refuses to load.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: typecheck + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+  contract:
+    name: contract + toolchain lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the Compact devtools
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf \
+            https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+          # $GITHUB_PATH only takes effect for *later* steps, so the toolchain
+          # install below is the first one that sees `compact` on PATH.
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install the pinned toolchain
+        run: |
+          # `compact update <version>` also makes that version the default, so
+          # there is no separate `compact use` step (that subcommand does not
+          # exist in the 0.5.x devtools).
+          compact update "$(cat .compact-version)"
+          compact compile --version
+
+      - name: Verify the active toolchain is the pinned one
+        run: |
+          pinned="$(cat .compact-version)"
+          installed="$(compact compile --version)"
+          echo "pinned:    $pinned"
+          echo "installed: $installed"
+          if [ "$pinned" != "$installed" ]; then
+            echo "::error::Compact toolchain mismatch — .compact-version pins $pinned but $installed is active."
+            exit 1
+          fi
+
+      - name: Recompile the contract with the pinned toolchain
+        run: |
+          # Compile to a scratch directory rather than into managed/, so the
+          # committed artifacts stay untouched and can be compared against it.
+          mkdir -p "$RUNNER_TEMP/recompiled"
+          compact compile contracts/counter.compact "$RUNNER_TEMP/recompiled"
+
+      - name: Committed artifacts must match a fresh compile
+        run: |
+          # Circuits, ZKIR and the prover/verifier keys all reproduce
+          # byte-for-byte. The single exception is contract/index.js.map, whose
+          # sourceRoot is written relative to the output directory, so it is
+          # excluded. Anything else here means managed/ was committed from a
+          # different source or a different toolchain.
+          diff -r -x '*.js.map' managed/counter "$RUNNER_TEMP/recompiled"
+
+      - name: Generated runtime version must match the compact-runtime pin
+        run: |
+          pin="$(sed -nE 's/.*"@midnight-ntwrk\/compact-runtime": "([^"]+)".*/\1/p' package.json)"
+          generated="$(grep -o "checkRuntimeVersion('[^']*')" managed/counter/contract/index.js \
+            | head -1 \
+            | sed -E "s/checkRuntimeVersion\('([^']+)'\)/\1/")"
+          echo "compact-runtime pin:  $pin"
+          echo "checkRuntimeVersion: $generated"
+          if [ -z "$pin" ] || [ "$pin" != "$generated" ]; then
+            echo "::error::Toolchain/runtime version lock violated — the contract is compiled against runtime $generated, but compact-runtime is pinned to $pin. Install the toolchain in .compact-version exactly (see README → The toolchain/runtime version lock)."
+            exit 1
+          fi
