@@ -7,6 +7,8 @@ network. Organisations publish that a payroll ran, that it respected a minimum-w
 floor, and what it paid in total — while every individual salary and every recipient
 identity stays on the payer's own device.
 
+[![CI](https://github.com/olaleyeolajide81-sketch/UmbraPay/actions/workflows/ci.yml/badge.svg)](https://github.com/olaleyeolajide81-sketch/UmbraPay/actions/workflows/ci.yml)
+
 ---
 
 ## Project Status
@@ -17,8 +19,9 @@ identity stays on the payer's own device.
 | Test suite | ✅ 16/16 passing (`npm test`) — circuit logic, state transitions, privacy guarantees |
 | Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview deployment |
 | Contract address | ✅ Deployed on Preview — `8c17…a5c`, see [Contract Address](#contract-address) |
+| Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
 | Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
-| Level 3 (CI enforcing the toolchain version lock) | 🔭 Scoped, not built |
+| Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
 ---
 
@@ -32,14 +35,34 @@ identity stays on the payer's own device.
 > **Deploy status.** Deployed to **Preview** on 2026-09-22. The wallet was funded from
 > the Preview faucet, DUST was generated from its registered NIGHT UTXOs, and the
 > contract was proved and submitted through the pinned 0.31.1 toolchain. The deployer
-> wallet is
-> `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny`
-> and the address above is also recorded in the gitignored `.midnight-state.json`.
+> wallet is listed under [Deployer Wallets](#deployer-wallets), and both it and the address
+> above are recorded in the gitignored `.midnight-state.json`.
 >
 > Preprod has no deployment. One follows the same path:
 > `npm run address -- --network preprod`, fund at the
 > [Preprod faucet](https://midnight-tmnight-preprod.nethermind.dev), then
 > `npm run deploy -- --network preprod`.
+
+---
+
+## Deployer Wallets
+
+The wallet each network's deploy tooling derived, as printed by `npm run address`. Both are
+derived deterministically from the seeds in the gitignored `.midnight-state.json`, so
+reproducing them takes no sync and no RPC call.
+
+| Network | Unshielded wallet address | Contract |
+|---|---|---|
+| Preview | `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny` | Deployed `8c17…a5c` on 2026-09-22 |
+| Preprod | `mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st` | None yet — fund this wallet, then `npm run deploy -- --network preprod` |
+
+Faucets: [Preview](https://midnight-tmnight-preview.nethermind.dev) ·
+[Preprod](https://midnight-tmnight-preprod.nethermind.dev)
+
+An unshielded address is a *receiving* address, not key material — publishing it is safe,
+and it is what a faucet is given. The seeds and recovery phrases that **control** these
+wallets are not in this repository: they live only in the gitignored
+`.midnight-state.json`.
 
 ---
 
@@ -279,6 +302,36 @@ search its bytes for the private values:
 
 ---
 
+## Continuous Integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and on every pull request. It is
+Level 3 of the project plan: the version lock documented below, enforced by the pipeline
+instead of rediscovered by each contributor at deploy time.
+
+| Job | What it does |
+|---|---|
+| `typecheck + tests` | `npm run typecheck`, then the 16-test suite against the committed `managed/` bindings. Node only — no proof server, no wallet, no funds. |
+| `contract + toolchain lock` | Installs the Compact devtools, installs the toolchain pinned in `.compact-version`, recompiles `contracts/counter.compact` from source, and asserts the three things below. |
+
+The `contract` job fails the build when any of these is true:
+
+1. **The active toolchain is not the pinned one.** `compact compile --version` must equal
+   `.compact-version` — 0.31.1.
+2. **`managed/` drifts from a fresh compile.** The job recompiles into a scratch directory
+   and diffs it against the committed artifacts. Circuits, ZKIR and the prover/verifier keys
+   reproduce byte-for-byte; only `contract/index.js.map` is excluded, because its
+   `sourceRoot` is written relative to the output directory.
+3. **The generated runtime version disagrees with the JS runtime.** The
+   `checkRuntimeVersion` call the compiler baked into `managed/counter/contract/index.js`
+   must match the `@midnight-ntwrk/compact-runtime` pin in `package.json` — 0.16.0. This is
+   the check that catches the trap: a newer toolchain with an older midnight-js compiles
+   happily and then refuses to load at deploy time.
+
+Both jobs run on a plain GitHub runner, because the tests need nothing but Node. Deploys
+stay a deliberate human action — see below.
+
+---
+
 ## Deploying
 
 ### 1. Check your wallet address and fund it
@@ -351,9 +404,17 @@ as an exact pin, and the Midnight `create-mn-app` scaffolder pins `0.31.1` in it
 install the pinned toolchain, not the latest.**
 
 ```bash
-compact update "$(cat .compact-version)"   # 0.31.1
-compact use 0.31.1
+compact update "$(cat .compact-version)"   # installs 0.31.1 and makes it the default
+compact compile --version                  # → 0.31.1
 ```
+
+`compact update <version>` sets the default compiler as it installs, so there is no separate
+step to switch to it (`compact use` is not a subcommand of the 0.5.x devtools).
+
+**CI enforces all of this** — the `contract` job fails the build if the active toolchain is
+not the pinned one, if `managed/` drifts from a fresh compile, or if the runtime version the
+compiler emitted disagrees with the `compact-runtime` pin in `package.json`. See
+[Continuous Integration](#continuous-integration).
 
 If you see a runtime version mismatch error, this is the cause.
 
@@ -382,7 +443,8 @@ UmbraPay/
 ├── tests/
 │   ├── counter.test.ts        # 16 tests: logic, transitions, privacy
 │   └── counter-simulator.ts   # in-process driver over compact-runtime
-├── .github/workflows/         # CI/CD (Level 3)
+├── .github/workflows/
+│   └── ci.yml                 # typecheck + tests, and the toolchain version lock (Level 3)
 ├── .compact-version           # pins the Compact toolchain — 0.31.1
 ├── .mcp.json                  # Midnight docs MCP server
 ├── docker-compose.yml         # proof server, pinned to 8.1.0
@@ -455,8 +517,9 @@ against a published floor, with a public aggregate and a verifiable receipt.
 one real gap: with a single participant the published aggregate *is* that participant's
 salary. Decoy payouts and batched disclosure windows fix that. Scoped, not built.
 
-**Level 3** adds CI, so the toolchain version lock documented above becomes something the
-pipeline enforces instead of something every contributor rediscovers the hard way.
+**Level 3** turns that version lock into something the pipeline enforces rather than
+something every contributor rediscovers the hard way — see
+[Continuous Integration](#continuous-integration).
 
 ---
 
