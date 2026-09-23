@@ -20,7 +20,7 @@ identity stays on the payer's own device.
 | Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview and Preprod deployments |
 | Contract address | ✅ Deployed on Preview (`8c17…a5c`) and Preprod (`14f9…7f3`), see [Contract Address](#contract-address) |
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
-| On-chain interaction | ✅ Exercised against the live Preview deployment — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
+| On-chain interaction | ✅ Exercised against both live deployments (Preview and Preprod) — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
 | Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
@@ -426,6 +426,14 @@ commitment changed — while neither the amount nor the recipient is anywhere on
 no ledger write, no return value. The script re-reads the ledger and asserts it is unchanged,
 and exits non-zero if a circuit that must publish nothing ever moves state.
 
+**Preprod, same two circuits, same result** — `npm run interact -- --network preprod` against
+`14f9…7f3`:
+
+| Circuit | Transaction | Block | Ledger effect |
+|---|---|---|---|
+| `commitPayout()` | `006721866736564b812782fbb227ea0ecc70b076d60754e9f6570cd25d9064fc0c` | 2669762 | round `1` → `2`, aggregate `0` → `2,500` |
+| `proveAboveFloor()` | `00ee79b3d632d1a25fdb32fb6cab46771d6c0ac39516e769af183b21f603ccb3b5` | 2669766 | none — the ledger is byte-for-byte identical |
+
 Each run holds its own private record, with a fresh salt, which is what a real payment does:
 two runs paying the same salary publish different commitments, so equal pay cannot be
 clustered off the ledger. The recipient secret and the salt are never printed — pin them
@@ -687,6 +695,14 @@ re-run the capture and they regenerate. The raw `.txt` sources sit beside each `
 > then proves the floor was respected while publishing nothing at all, and the script
 > re-reads the ledger to confirm it did not change. Both transaction ids and block heights
 > are in the capture, and both are `SUCCESS` on chain.
+
+### The same, on Preprod
+
+![interact with the deployed preprod contract](screenshots/06-interact-preprod.svg)
+
+> The identical flow against `14f9…7f3` on Preprod: `commitPayout()` in block 2669762 and
+> `proveAboveFloor()` in block 2669766, both `SUCCESS`, with the Preprod ledger going from
+> round 1 / aggregate 0 to round 2 / aggregate 2,500 and back to byte-for-byte unchanged.
 
 ---
 
