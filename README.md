@@ -17,8 +17,8 @@ identity stays on the payer's own device.
 |---|---|
 | Level 1 settlement core (`contracts/counter.compact`) | ✅ Complete — 3 circuits, compiled artifacts committed for review |
 | Test suite | ✅ 16/16 passing (`npm test`) — circuit logic, state transitions, privacy guarantees |
-| Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview deployment |
-| Contract address | ✅ Deployed on Preview — `8c17…a5c`, see [Contract Address](#contract-address) |
+| Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview and Preprod deployments |
+| Contract address | ✅ Deployed on Preview (`8c17…a5c`) and Preprod (`14f9…7f3`), see [Contract Address](#contract-address) |
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
 | Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
@@ -30,18 +30,22 @@ identity stays on the payer's own device.
 | Network  | Address                                              |
 |----------|------------------------------------------------------|
 | Preview  | `8c1765ec101c02e4d4a024c7416185f9d619fcc296aebaf55b436159aed57a5c` |
-| Preprod  | *not deployed yet*                                    |
+| Preprod  | `14f9ade83ce4f188662767edb3a5607d6f43e67d6c09d84fd8932b82dcdf07f3` |
 
-> **Deploy status.** Deployed to **Preview** on 2026-09-22. The wallet was funded from
-> the Preview faucet, DUST was generated from its registered NIGHT UTXOs, and the
-> contract was proved and submitted through the pinned 0.31.1 toolchain. The deployer
-> wallet is listed under [Deployer Wallets](#deployer-wallets), and both it and the address
-> above are recorded in the gitignored `.midnight-state.json`.
+> **Deploy status.** Deployed to **Preview** on 2026-09-22 and to **Preprod** on
+> 2026-09-23, both with the same procedure: derive the wallet with
+> `npm run address -- --network <net>`, fund it from that network's faucet, let DUST
+> accrue from the registered NIGHT UTXOs, then `npm run deploy -- --network <net>`. The
+> contract is proved and submitted through the pinned 0.31.1 toolchain in both cases. The
+> deployer wallets are listed under [Deployer Wallets](#deployer-wallets), and each wallet
+> plus its contract address is recorded in the gitignored `.midnight-state.json`.
 >
-> Preprod has no deployment. One follows the same path:
-> `npm run address -- --network preprod`, fund at the
-> [Preprod faucet](https://midnight-tmnight-preprod.nethermind.dev), then
-> `npm run deploy -- --network preprod`.
+> The Preprod deploy was first blocked by a Preprod **indexer** outage — its load balancer
+> (`server: awselb/2.0`) returned `503` with no healthy backends for roughly an hour, while
+> the node itself kept producing blocks with a healthy peer count. A wallet discovers its
+> UTXOs and DUST through the indexer, so the DUST gate could not pass until it recovered;
+> the deploy then succeeded on the first attempt. Both addresses in the table above are
+> confirmed on chain, not merely printed by the script.
 
 ---
 
@@ -54,7 +58,7 @@ reproducing them takes no sync and no RPC call.
 | Network | Unshielded wallet address | Contract |
 |---|---|---|
 | Preview | `mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny` | Deployed `8c17…a5c` on 2026-09-22 |
-| Preprod | `mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st` | None yet — fund this wallet, then `npm run deploy -- --network preprod` |
+| Preprod | `mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st` | Deployed `14f9…7f3` on 2026-09-23 |
 
 Faucets: [Preview](https://midnight-tmnight-preview.nethermind.dev) ·
 [Preprod](https://midnight-tmnight-preprod.nethermind.dev)
