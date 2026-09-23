@@ -1,0 +1,61 @@
+$ npm run interact -- --network preview
+
+╔══════════════════════════════════════════════════════════════╗
+║  UmbraPay — interact with the deployed contract
+╚══════════════════════════════════════════════════════════════╝
+  Network:           preview
+  Contract address:  8c1765ec101c02e4d4a024c7416185f9d619fcc296aebaf55b436159aed57a5c
+  Deployed:          2026-09-22T09:34:21.564Z
+  Deployed by:       mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny
+─── Wallet setup ───────────────────────────────────────────────
+  Creating wallet...
+  Restored 3/3 child wallets from saved state — sync will resume.
+  Syncing with network...
+  ℹ  RPC disconnection messages during sync are normal and can be safely ignored.
+  ✓ Synced with network.                                      
+  Wallet Address: mn_addr_preview1y73mmfdus9dn3c7c0wkf4nm79qed5zdvj4nuhpzhrg4zxpvxvn2q9ffrny
+  Balance: 5,000,000,000 tNight
+  Checking proof server...
+  Proof server ready!                                 
+─── DUST ───────────────────────────────────────────────────────
+  DUST tokens ready!
+─── Public ledger BEFORE ───────────────────────────────────────
+  payrollFloor          1,000
+  payrollRound          1
+  totalDisbursed        0
+  lastPayoutCommitment  0x756d6272617061793a67656e6573697300000000000000000000000000000000
+─── connect to the deployed contract ───────────────────────────
+  Loading this contract's private-state slot — the witness record
+  that never leaves this machine.
+─── commitPayout() ─────────────────────────────────────────────
+  Private inputs (witnesses, held locally and never published):
+    salaryAmount     2,500
+    recipientSecret  <held locally, not printed>
+    paymentSalt      <fresh per run, not printed>
+  Proving and submitting...
+  ✓ Settled. Tx: 008a63157b228961fd4106ca13109fe4098cdba57e42af1a16f2ea48ee44ab125a
+             Block: 986207
+─── Public ledger AFTER commitPayout() ─────────────────────────
+  payrollFloor          1,000
+  payrollRound          2
+  totalDisbursed        2,500
+  lastPayoutCommitment  0x422d508742f3c04d374fbfaf00986d7e56e2eff1c2061e9690dc78cb70167e1a
+  The aggregate moved by exactly the private salary (2,500),
+  the round advanced by one, and the commitment changed — while neither
+  the amount nor the recipient appears anywhere on the ledger.
+─── proveAboveFloor() ──────────────────────────────────────────
+  The compliance primitive: prove the private salary clears the public
+  floor, publishing nothing at all — no ledger write, no return value.
+  Proving and submitting...
+  ✓ Proven. Tx: 008bd0e1ea6d5daa4a57dddd8543e136fc14a76603996e9b267de2101468726526
+            Block: 986211
+  Ledger unchanged by that transaction: ✓ yes
+─── Done ───────────────────────────────────────────────────────
+  Both transactions are finalised on chain, so checking the result needs
+  neither this script nor its local state:
+    curl -s -X POST -H 'Content-Type: application/json' -d '{"query":"query($a:String!){contractAction(address:$a){state}}","variables":{"a":"8c1765ec101c02e4d4a024c7416185f9d619fcc296aebaf55b436159aed57a5c"}}' https://indexer.preview.midnight.network/api/v4/graphql
+  A non-null `state` is this contract. Those bytes are the four public
+  fields printed above, decoded by managed/counter/contract/index.js —
+  and nothing else.
+  Contract: 8c1765ec101c02e4d4a024c7416185f9d619fcc296aebaf55b436159aed57a5c
+  Network:  preview

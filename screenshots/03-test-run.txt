@@ -1,8 +1,8 @@
 $ npm test
  RUN  v5.0.1 /workspaces/UmbraPay
 Sourcemap for "/workspaces/UmbraPay/managed/counter/contract/index.js" points to missing source files
- ✓ tests/counter.test.ts (16 tests) 641ms
+ ✓ tests/counter.test.ts (16 tests) 810ms
  Test Files  1 passed (1)
       Tests  16 passed (16)
-   Start at  00:43:13
-   Duration  1000ms (tests 73%, transform 19%, import 7%)
+   Start at  03:52:05
+   Duration  1.29s (tests 73%, transform 18%, import 8%)

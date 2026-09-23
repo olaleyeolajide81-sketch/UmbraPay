@@ -48,6 +48,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # compact-runtime accepts ^3.0.0 for the onchain runtime while
+      # midnight-js-protocol pins it to exactly 3.0.0, so a naive install hoists
+      # 3.1.1 and nests 3.0.0. Two copies means two StateValue classes, and
+      # `instanceof` compares classes: the first circuit call against an
+      # ALREADY-DEPLOYED contract then dies with "expected instance of
+      # StateValue". Deploying still works, so nothing else here would catch it.
+      # The package.json override plus the deduped lockfile keep it at one copy.
+      - name: Exactly one onchain-runtime copy
+        run: |
+          copies="$(find node_modules -path '*onchain-runtime-v3/package.json' -not -path '*/dist/*')"
+          count="$(printf '%s\n' "$copies" | grep -c . || true)"
+          printf '%s\n' "$copies"
+          echo "copies: $count"
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected exactly one @midnight-ntwrk/onchain-runtime-v3 copy, found $count. Run 'npm install && npm dedupe' — see README → The second trap."
+            exit 1
+          fi
+
       - name: Typecheck
         run: npm run typecheck
 

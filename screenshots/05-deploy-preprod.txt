@@ -1,0 +1,30 @@
+$ npm run deploy -- --network preprod
+
+╔══════════════════════════════════════════════════════════════╗
+║  Deploy UmbraPay to preprod
+╚══════════════════════════════════════════════════════════════╝
+  Payroll floor (public constructor arg): 1000
+─── Wallet setup ───────────────────────────────────────────────
+  Creating wallet...
+  Restored 3/3 child wallets from saved state — sync will resume.
+  Syncing with network...
+  ℹ  This may take several minutes depending on network size.
+     RPC disconnection messages during sync are normal and can be safely ignored.
+  ✓ Synced with network.                                      
+  Wallet Address: mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st
+  Balance: 5,000,000,000 tNight
+─── DUST Token Setup ───────────────────────────────────────────
+  DUST tokens ready!
+─── Deploy Contract ────────────────────────────────────────────
+  Checking proof server...
+  Proof server ready!                                 
+  Setting up providers...
+  Generating DUST... done.
+  Deploying contract...
+  ✅ Contract deployed successfully!
+  ┌────────────────────────────────────────────────────────────┐
+  │  CONTRACT ADDRESS: 14f9ade83ce4f188662767edb3a5607d6f43e67d6c09d84fd8932b82dcdf07f3
+  └────────────────────────────────────────────────────────────┘
+  Saved to .midnight-state.json
+─── Deployment complete ────────────────────────────────────────
+  Paste the address above into the Contract Address table in README.md.

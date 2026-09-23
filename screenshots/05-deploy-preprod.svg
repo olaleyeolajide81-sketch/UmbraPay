@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="782" height="694" viewBox="0 0 782 694" font-family="'JetBrains Mono','SF Mono',Menlo,Consolas,monospace" font-size="13.5">
+  <defs>
+    <clipPath id="round"><rect x="0" y="0" width="782" height="694" rx="10"/></clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="782" height="694" fill="#0d1117"/>
+    <rect width="782" height="34" fill="#161b22"/>
+    <line x1="0" y1="34" x2="782" y2="34" stroke="#30363d"/>
+    <circle cx="19" cy="17" r="6" fill="#ff5f56"/>
+    <circle cx="39" cy="17" r="6" fill="#ffbd2e"/>
+    <circle cx="59" cy="17" r="6" fill="#27c93f"/>
+    <text x="391" y="21" fill="#8b949e" text-anchor="middle" font-size="12">npm run deploy -- --network preprod</text>
+    <text x="18" y="62" fill="#3fb950">$ npm run deploy -- --network preprod</text>
+    <text x="18" y="82" fill="#c9d1d9"> </text>
+    <text x="18" y="103" fill="#79c0ff">╔══════════════════════════════════════════════════════════════╗</text>
+    <text x="18" y="124" fill="#c9d1d9">║  Deploy UmbraPay to preprod</text>
+    <text x="18" y="145" fill="#79c0ff">╚══════════════════════════════════════════════════════════════╝</text>
+    <text x="18" y="166" fill="#c9d1d9">  Payroll floor (public constructor arg): 1000</text>
+    <text x="18" y="187" fill="#c9d1d9">─── Wallet setup ───────────────────────────────────────────────</text>
+    <text x="18" y="208" fill="#c9d1d9">  Creating wallet...</text>
+    <text x="18" y="229" fill="#c9d1d9">  Restored 3/3 child wallets from saved state — sync will resume.</text>
+    <text x="18" y="250" fill="#c9d1d9">  Syncing with network...</text>
+    <text x="18" y="271" fill="#c9d1d9">  ℹ  This may take several minutes depending on network size.</text>
+    <text x="18" y="292" fill="#c9d1d9">     RPC disconnection messages during sync are normal and can be safely ignored.</text>
+    <text x="18" y="313" fill="#3fb950">  ✓ Synced with network.                                      </text>
+    <text x="18" y="334" fill="#c9d1d9">  Wallet Address: mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st</text>
+    <text x="18" y="354" fill="#c9d1d9">  Balance: 5,000,000,000 tNight</text>
+    <text x="18" y="375" fill="#c9d1d9">─── DUST Token Setup ───────────────────────────────────────────</text>
+    <text x="18" y="396" fill="#c9d1d9">  DUST tokens ready!</text>
+    <text x="18" y="417" fill="#c9d1d9">─── Deploy Contract ────────────────────────────────────────────</text>
+    <text x="18" y="438" fill="#c9d1d9">  Checking proof server...</text>
+    <text x="18" y="459" fill="#c9d1d9">  Proof server ready!                                 </text>
+    <text x="18" y="480" fill="#c9d1d9">  Setting up providers...</text>
+    <text x="18" y="501" fill="#c9d1d9">  Generating DUST... done.</text>
+    <text x="18" y="522" fill="#c9d1d9">  Deploying contract...</text>
+    <text x="18" y="543" fill="#3fb950">  ✅ Contract deployed successfully!</text>
+    <text x="18" y="564" fill="#79c0ff">  ┌────────────────────────────────────────────────────────────┐</text>
+    <text x="18" y="585" fill="#d2a8ff">  │  CONTRACT ADDRESS: 14f9ade83ce4f188662767edb3a5607d6f43e67d6c09d84fd8932b82dcdf07f3</text>
+    <text x="18" y="606" fill="#79c0ff">  └────────────────────────────────────────────────────────────┘</text>
+    <text x="18" y="626" fill="#c9d1d9">  Saved to .midnight-state.json</text>
+    <text x="18" y="647" fill="#c9d1d9">─── Deployment complete ────────────────────────────────────────</text>
+    <text x="18" y="668" fill="#d2a8ff">  Paste the address above into the Contract Address table in README.md.</text>
+  </g>
+  <rect x="0.5" y="0.5" width="781" height="693" rx="10" fill="none" stroke="#30363d"/>
+</svg>

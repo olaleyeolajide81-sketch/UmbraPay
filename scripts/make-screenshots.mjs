@@ -125,6 +125,9 @@ const TITLES = {
   '02-managed-artifacts': 'managed/counter — generated circuits, keys and ZKIR',
   '03-test-run': 'npm test — 16 passing',
   '04-deploy-preview': 'npm run deploy -- --network preview',
+  '05-deploy-preprod': 'npm run deploy -- --network preprod',
+  '06-interact-preview': 'npm run interact -- --network preview',
+  '06-interact-preprod': 'npm run interact -- --network preprod',
 };
 
 const files = fs

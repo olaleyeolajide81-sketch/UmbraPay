@@ -20,6 +20,7 @@ identity stays on the payer's own device.
 | Deploy tooling (Preview / Preprod) | ✅ Complete — used for the live Preview and Preprod deployments |
 | Contract address | ✅ Deployed on Preview (`8c17…a5c`) and Preprod (`14f9…7f3`), see [Contract Address](#contract-address) |
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
+| On-chain interaction | ✅ Exercised against the live Preview deployment — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
 | Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
@@ -232,7 +233,7 @@ and a `managed/counter/` directory containing:
 
 ```
 managed/counter/
-├── compiler/           contract-info.json, contract-manifest.json
+├── compiler/           contract-info.json
 ├── contract/           index.js, index.d.ts   ← the TypeScript binding
 ├── keys/               <circuit>.prover, <circuit>.verifier   ← per circuit
 └── zkir/               <circuit>.zkir, <circuit>.bzkir        ← ZK intermediate representation
@@ -314,7 +315,7 @@ instead of rediscovered by each contributor at deploy time.
 
 | Job | What it does |
 |---|---|
-| `typecheck + tests` | `npm run typecheck`, then the 16-test suite against the committed `managed/` bindings. Node only — no proof server, no wallet, no funds. |
+| `typecheck + tests` | `npm run typecheck`, then the 16-test suite against the committed `managed/` bindings. Node only — no proof server, no wallet, no funds. Also asserts that exactly **one** copy of the onchain runtime is installed — see [the second trap](#the-second-trap-two-copies-of-the-onchain-runtime). |
 | `contract + toolchain lock` | Installs the Compact devtools, installs the toolchain pinned in `.compact-version`, recompiles `contracts/counter.compact` from source, and asserts the three things below. |
 
 The `contract` job fails the build when any of these is true:
@@ -332,7 +333,7 @@ The `contract` job fails the build when any of these is true:
    happily and then refuses to load at deploy time.
 
 Both jobs run on a plain GitHub runner, because the tests need nothing but Node. Deploys
-stay a deliberate human action — see below.
+and on-chain calls stay deliberate human actions — see below.
 
 ---
 
@@ -387,6 +388,61 @@ If the proof server is not running, proofs fail with `connect ECONNREFUSED 127.0
 
 ---
 
+## Interacting with the deployed contract
+
+Deploying proves the contract *can* be deployed. This proves it *runs*:
+
+```bash
+npm run interact -- --network preview
+MIDNIGHT_SALARY_AMOUNT=2500 npm run interact -- --network preview   # default: the on-chain floor
+```
+
+It settles a real payout and then runs the compliance circuit, printing the public ledger
+before and after each one. This is the live Preview deployment, not a simulation:
+
+```
+─── commitPayout() ─────────────────────────────────────────────
+  Private inputs (witnesses, held locally and never published):
+    salaryAmount     2,500
+    recipientSecret  <held locally, not printed>
+    paymentSalt      <fresh per run, not printed>
+  ✓ Settled. Tx: 008a63157b228961fd4106ca13109fe4098cdba57e42af1a16f2ea48ee44ab125a
+             Block: 986207
+─── Public ledger AFTER commitPayout() ─────────────────────────
+  payrollFloor          1,000
+  payrollRound          2
+  totalDisbursed        2,500
+  lastPayoutCommitment  0x422d508742f3c04d374fbfaf00986d7e56e2eff1c2061e9690dc78cb70167e1a
+
+─── proveAboveFloor() ──────────────────────────────────────────
+  ✓ Proven. Tx: 008bd0e1ea6d5daa4a57dddd8543e136fc14a76603996e9b267de2101468726526
+            Block: 986211
+  Ledger unchanged by that transaction: ✓ yes
+```
+
+The aggregate moved by exactly the private salary, the round advanced by one, and the
+commitment changed — while neither the amount nor the recipient is anywhere on the ledger.
+`proveAboveFloor()` then submits a second transaction that publishes **nothing at all**:
+no ledger write, no return value. The script re-reads the ledger and asserts it is unchanged,
+and exits non-zero if a circuit that must publish nothing ever moves state.
+
+Each run holds its own private record, with a fresh salt, which is what a real payment does:
+two runs paying the same salary publish different commitments, so equal pay cannot be
+clustered off the ledger. The recipient secret and the salt are never printed — pin them
+with `MIDNIGHT_RECIPIENT_SECRET` / `MIDNIGHT_PAYMENT_SALT` only when you need reproducible
+output.
+
+Both transactions are verifiable without trusting this repository or its local state:
+
+```bash
+curl -s -X POST -H 'Content-Type: application/json' \
+  -d '{"query":"query($o: TransactionOffset!){ transactions(offset:$o){ id hash block{ height timestamp } ... on RegularTransaction { transactionResult { status } } } }","variables":{"o":{"identifier":"008a63157b228961fd4106ca13109fe4098cdba57e42af1a16f2ea48ee44ab125a"}}}' \
+  https://indexer.preview.midnight.network/api/v4/graphql
+# → "transactionResult": { "status": "SUCCESS" }, block 986207
+```
+
+---
+
 ## The toolchain/runtime version lock
 
 **This is the trap that costs the most time on Midnight, so it is worth stating plainly.**
@@ -422,6 +478,49 @@ compiler emitted disagrees with the `compact-runtime` pin in `package.json`. See
 
 If you see a runtime version mismatch error, this is the cause.
 
+### The second trap: two copies of the onchain runtime
+
+The compiler/runtime lock above is about *versions*. This one is about *copies*, and it only
+bites once the contract is already deployed.
+
+`compact-runtime@0.16.0` declares `@midnight-ntwrk/onchain-runtime-v3: ^3.0.0`, while
+`midnight-js-protocol@4.1.1` pins the same package to **exactly `3.0.0`**. A plain
+`npm install` satisfies both declarations literally — hoisting `3.1.1` for the runtime and
+nesting `3.0.0` under the protocol:
+
+```
+umbrapay@0.1.0
+├─┬ @midnight-ntwrk/compact-runtime@0.16.0
+│ └── @midnight-ntwrk/onchain-runtime-v3@3.1.1      ← hoisted, satisfies ^3.0.0
+└─┬ @midnight-ntwrk/midnight-js-protocol@4.1.1
+  └── @midnight-ntwrk/onchain-runtime-v3@3.0.0      ← nested, satisfies the exact pin
+```
+
+Two copies means two `StateValue` *classes*, and `instanceof` compares classes, not versions.
+Deploying still works, which is what makes this one nasty — `deployContract` runs the
+constructor locally, so the state it produces is internally consistent. It breaks on the
+first **circuit call against an already-deployed contract**: the SDK fetches the contract
+state through the indexer (one copy) and builds a `ChargedState` from the other.
+
+```
+Error: Unexpected error executing scoped transaction '<unnamed>':
+  Error: expected instance of StateValue
+```
+
+Pin the deduped version: `3.0.0` satisfies both declarations, because it sits inside
+`compact-runtime`'s `^3.0.0` range and is exactly what `midnight-js-protocol` asks for.
+
+```json
+"overrides": { "@midnight-ntwrk/onchain-runtime-v3": "3.0.0" }
+```
+
+```bash
+npm install && npm dedupe   # one hoisted copy, recorded in the lockfile
+```
+
+The `test` job in CI asserts that exactly one copy exists on disk, so this cannot come back
+silently. See [Continuous Integration](#continuous-integration).
+
 ---
 
 ## Project Structure
@@ -438,7 +537,10 @@ UmbraPay/
 │       └── zkir/              # per-circuit ZK intermediate representation
 ├── src/
 │   ├── witnesses.ts           # the PRIVACY BOUNDARY, TypeScript side
+│   ├── contract.ts            # compiled-contract loading + private-state records
+│   ├── providers.ts           # proof server, Midnight providers, DUST
 │   ├── deploy.ts              # deploy to Preview / Preprod
+│   ├── interact.ts            # call the deployed contract on chain
 │   ├── address.ts             # print the wallet address without syncing
 │   ├── network.ts             # network configs, faucet URLs, seed management
 │   ├── wallet.ts              # wallet construction + sync-state restore
@@ -449,6 +551,8 @@ UmbraPay/
 │   └── counter-simulator.ts   # in-process driver over compact-runtime
 ├── .github/workflows/
 │   └── ci.yml                 # typecheck + tests, and the toolchain version lock (Level 3)
+├── screenshots/               # generated from real command output (.txt + .svg)
+├── LICENSE                    # Apache-2.0
 ├── .compact-version           # pins the Compact toolchain — 0.31.1
 ├── .mcp.json                  # Midnight docs MCP server
 ├── docker-compose.yml         # proof server, pinned to 8.1.0
@@ -477,6 +581,8 @@ rationale is documented at the top of `contracts/counter.compact`.
 | `compact: command not found` | Run `source $HOME/.local/bin/env` to put the devtools on PATH. |
 | `npm install -g @midnight-ntwrk/compact-compiler` → 404 | That package does not exist. Install the devtools as shown in [Prerequisites](#prerequisites). |
 | `checkRuntimeVersion` mismatch at deploy | Toolchain/runtime version lock — see [above](#the-toolchainruntime-version-lock). Install `compact update 0.31.1`. |
+| `expected instance of StateValue` on the first on-chain circuit call | Two copies of the onchain runtime. Check with `npm ls @midnight-ntwrk/onchain-runtime-v3` — one version, one directory. See [the second trap](#the-second-trap-two-copies-of-the-onchain-runtime). |
+| Preprod indexer returns `503`, sync never completes | Midnight-side outage: its load balancer has no healthy backends. The chain keeps producing blocks, but wallets discover UTXOs and DUST *through the indexer*, so deploy and interact both wait. Retry once it answers — a `405` to a GET means a backend is up again. |
 | `connect ECONNREFUSED 127.0.0.1:6300` | Proof server is down: `docker compose up -d`. |
 | Deploy hangs on "Still syncing..." | Normal on Preview — the first sync replays from genesis (~15 min). Sync state is cached, so reruns are fast. |
 | `Balance: 0 tNight` after using the faucet | The faucet transaction has not landed yet. The deploy polls for up to `MIDNIGHT_FAUCET_TIMEOUT_MS` (default 600000). |
@@ -563,3 +669,27 @@ re-run the capture and they regenerate. The raw `.txt` sources sit beside each `
 > The wallet was subsequently funded, and the next run completed the flow end to end —
 > the contract address it printed is now published in the
 > [Contract Address](#contract-address) table.
+
+### Deploy to Preprod — completed
+
+![deploy to preprod](screenshots/05-deploy-preprod.svg)
+
+> The same flow end to end on Preprod: wallet synced and funded, DUST ready, contract proved
+> and submitted, and the address it prints is the one published in the
+> [Contract Address](#contract-address) table.
+
+### Exercising the deployed contract on chain
+
+![interact with the deployed contract](screenshots/06-interact-preview.svg)
+
+> Two real transactions against the live Preview deployment. `commitPayout()` settles a
+> payout and moves the public aggregate by exactly the private salary; `proveAboveFloor()`
+> then proves the floor was respected while publishing nothing at all, and the script
+> re-reads the ledger to confirm it did not change. Both transaction ids and block heights
+> are in the capture, and both are `SUCCESS` on chain.
+
+---
+
+## License
+
+Apache-2.0 — see [LICENSE](LICENSE).
