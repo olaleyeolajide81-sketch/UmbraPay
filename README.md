@@ -336,9 +336,15 @@ npm run preview # preview the production build locally
 
 ## Demo Video
 
-**🌐 Live frontend for recording:** [https://umbrapay.vercel.app](https://umbrapay.vercel.app)
+**🌐 Live frontend:** [https://umbrapay.vercel.app](https://umbrapay.vercel.app)
 
-[DEMO VIDEO LINK — record with the steps below and paste here]
+**🎬 Demo video (MP4, 714 KB, 29 s):**
+[▶ Watch demo-video.mp4](https://github.com/olaleyeolajide81-sketch/UmbraPay/raw/main/demo-video.mp4)
+
+> The video was generated fully automatically — zero manual input — using the
+> Playwright headless recorder in `scripts/record-demo.mjs` and converted to H.264 MP4
+> with ffmpeg. Re-run any time with `node scripts/record-demo.mjs` (requires
+> `npx playwright install chromium` and `ffmpeg`).
 
 ### Demo Video Checklist (Step 7 compliance)
 
