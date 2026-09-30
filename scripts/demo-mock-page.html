@@ -183,6 +183,76 @@
       border-radius: 6px;
       animation: highlight-pulse 1.5s ease-in-out 2;
     }
+
+    /* Terminal panel */
+    .terminal-panel {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .terminal-panel__title {
+      color: #8b9ab5;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 0.5rem;
+    }
+    .terminal-panel__line { line-height: 1.7; }
+    .t-dim  { color: #484f58; }
+    .t-green { color: #3fb950; }
+    .t-cyan  { color: #79c0ff; }
+    .t-white { color: #e6edf3; }
+    .t-bold  { font-weight: 700; }
+    .t-muted { color: #8b949e; }
+
+    /* CI badge panel */
+    .ci-badge-panel {
+      background: var(--midnight-card);
+      border: 1px solid var(--midnight-border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+    }
+    .ci-badge-panel__title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .ci-badge-panel__readme {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #e6edf3;
+    }
+    .ci-badge-panel__badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .badge-img {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #238636;
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-label { background: #21262d; padding: 2px 8px; border-radius: 4px 0 0 4px; }
+    .badge-status { background: #238636; padding: 2px 8px; border-radius: 0 4px 4px 0; }
   </style>
 </head>
 <body>
@@ -309,6 +379,40 @@
         <dt>Contract address</dt>
         <dd><code class="contract-card__address">14f9ade83ce4f188662767edb3a5607d6f43e67d6c09d84fd8932b82dcdf07f3</code></dd>
       </dl>
+    </section>
+
+    <!-- Terminal: test output -->
+    <section class="terminal-panel" id="test-terminal" aria-label="Test output">
+      <div class="terminal-panel__title">📋 npm test — 16 tests passing</div>
+      <div class="terminal-panel__line t-dim">$ npm test</div>
+      <div class="terminal-panel__line t-dim">&nbsp;</div>
+      <div class="terminal-panel__line t-dim">&gt; umbrapay@0.1.0 test</div>
+      <div class="terminal-panel__line t-dim">&gt; vitest run</div>
+      <div class="terminal-panel__line t-dim">&nbsp;</div>
+      <div class="terminal-panel__line"><span class="t-bold t-white"> RUN </span> <span class="t-cyan">v5.0.1</span></div>
+      <div class="terminal-panel__line t-dim">&nbsp;</div>
+      <div class="terminal-panel__line"><span class="t-green"> ✓</span> <span class="t-white">tests/counter.test.ts</span> <span class="t-muted">(16 tests) 1423ms</span></div>
+      <div class="terminal-panel__line t-dim">&nbsp;</div>
+      <div class="terminal-panel__line"><span class="t-muted"> Test Files  </span><span class="t-bold t-green">1 passed</span><span class="t-muted"> (1)</span></div>
+      <div class="terminal-panel__line"><span class="t-muted">      Tests  </span><span class="t-bold t-green">16 passed</span><span class="t-muted"> (16)</span></div>
+      <div class="terminal-panel__line"><span class="t-muted">   Start at  </span><span class="t-white">17:42:50</span></div>
+      <div class="terminal-panel__line"><span class="t-muted">   Duration  </span><span class="t-white">2.56s</span></div>
+    </section>
+
+    <!-- CI badge in README -->
+    <section class="ci-badge-panel" id="ci-badge-section" aria-label="CI badge">
+      <div class="ci-badge-panel__title">📄 README.md — CI badge (green)</div>
+      <div class="ci-badge-panel__readme">
+        <div class="ci-badge-panel__badge-row">
+          <span class="t-muted"># UmbraPay</span>
+        </div>
+        <div class="ci-badge-panel__badge-row" style="margin-top:0.35rem">
+          <span class="badge-label" style="background:#21262d;color:#e6edf3;padding:3px 8px;border-radius:4px 0 0 4px;font-size:0.82rem">CI</span><span class="badge-status" style="background:#238636;color:#fff;padding:3px 10px;border-radius:0 4px 4px 0;font-size:0.82rem">✓ passing</span>
+        </div>
+        <div style="margin-top:0.5rem;color:#8b949e;font-size:0.78rem">
+          github.com/olaleyeolajide81-sketch/UmbraPay/actions/workflows/ci.yml
+        </div>
+      </div>
     </section>
   </main>
 

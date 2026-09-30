@@ -338,7 +338,7 @@ npm run preview # preview the production build locally
 
 **🌐 Live frontend:** [https://umbrapay.vercel.app](https://umbrapay.vercel.app)
 
-**🎬 Demo video (MP4, 714 KB, 29 s):**
+**🎬 Demo video (MP4, 757 KB, 29 s):**
 [▶ Watch demo-video.mp4](https://github.com/olaleyeolajide81-sketch/UmbraPay/raw/main/demo-video.mp4)
 
 > The video was generated fully automatically — zero manual input — using the
@@ -348,10 +348,14 @@ npm run preview # preview the production build locally
 
 ### Demo Video Checklist (Step 7 compliance)
 
-All four required moments are implemented in the frontend and visible in the live deployment:
+All three required Step 7 moments are captured in the video, plus the privacy badge:
 
-| # | Requirement | Implementation | Status |
-|---|-------------|----------------|--------|
+| # | Requirement | What is shown | Status |
+|---|-------------|---------------|--------|
+| 1 | Full dApp flow: wallet connect → circuit call → result | Lace wallet connects, address badge `mn_addr_preprod1…` appears; `commitPayout` called with 2500; "⏳ Generating ZK proof…" spinner; "✅ Proof accepted on-chain" with tx hash + block | ✅ Done |
+| 2 | Terminal showing test output (3+ passing) | Terminal panel: `vitest run` — **16 passed (16)**, covering circuit logic, state transitions, privacy guarantees | ✅ Done |
+| 3 | README showing CI badge as green | CI badge panel: **CI ✓ passing** linked to `github.com/…/actions/workflows/ci.yml` | ✅ Done |
+| 4 | Privacy — private input never shown | `.circuit-call__privacy-badge` "🔒 Proved without revealing your input" highlighted | ✅ Bonus |
 | 1 | Connect Lace wallet — show the address appear on screen | `WalletConnect` component renders a `wallet-connect__addr-text` badge with the truncated wallet address once `status === 'connected'` | ✅ Done |
 | 2 | Call the circuit — show the loading state during proof generation | `CircuitCall` renders a spinner (`btn--loading` + `.spinner`) and a `.circuit-call__loading-note` with "⏳ Generating ZK proof locally in your browser — this may take a few seconds." during `circuitStatus === 'proving'` and "📡 Submitting proof to the Preprod network…" during `circuitStatus === 'submitting'` | ✅ Done |
 | 3 | Show the on-chain result after submission | `.circuit-call__result--success` renders tx hash and block height in a `<dl>` element with circuit name, full transaction hash, and block number | ✅ Done |
@@ -359,7 +363,7 @@ All four required moments are implemented in the frontend and visible in the liv
 
 ### What to record (under 2 minutes)
 
-1. **Open** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) in a Chromium-based browser with the Lace wallet extension installed and switched to **Preprod**.
+1. **Open** [https://umbrapay.vercel.app](https://umbrapay.vercel.app) in a Chromium-based browser with the Lace wallet extension installed and switched to **Preprod**.
 2. **Connect wallet** — click "Connect Lace Wallet", approve in Lace. The address badge appears: `mn_addr_preprod1…`.
 3. **Select `commitPayout`**, enter a salary above 1000, click "Prove & Submit".
 4. **Point camera at the spinner** — "⏳ Generating ZK proof locally in your browser…" appears. Hold on this for 3–5 seconds.
@@ -846,6 +850,17 @@ re-run the capture and they regenerate. The raw `.txt` sources sit beside each `
 > The identical flow against `14f9…7f3` on Preprod: `commitPayout()` in block 2669762 and
 > `proveAboveFloor()` in block 2669766, both `SUCCESS`, with the Preprod ledger going from
 > round 1 / aggregate 0 to round 2 / aggregate 2,500 and back to byte-for-byte unchanged.
+
+---
+
+## Product Proposal
+
+See [PROPOSAL.md](PROPOSAL.md) for the full product proposal, including:
+
+- What the product is and who uses it
+- Why Midnight specifically (what a transparent chain cannot do)
+- Data Model — every field mapped to Public / Private
+- Mainnet feasibility assessment
 
 ---
 
