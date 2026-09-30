@@ -45,3 +45,5 @@ public/zk/
 # that the compiled circuits, ZKIR and proving/verifying keys are inspectable
 # without installing the Compact toolchain. Regenerate with `npm run compact`.
 .netlify/
+.vercel
+.env*

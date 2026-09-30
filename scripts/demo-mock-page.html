@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UmbraPay — Demo Recording Page</title>
+  <style>
+    /* ============================================================
+       Full copy of the UmbraPay design system — matches production
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --midnight-bg:       #0a0e1a;
+      --midnight-surface:  #111829;
+      --midnight-card:     #161e30;
+      --midnight-border:   #1e2d4a;
+      --midnight-accent:   #7c5cfc;
+      --midnight-accent2:  #4fc3f7;
+      --midnight-success:  #43e97b;
+      --midnight-error:    #ff6b6b;
+      --midnight-warn:     #ffd166;
+      --text-primary:      #e8edf5;
+      --text-secondary:    #8b9ab5;
+      --text-muted:        #4a5568;
+      --radius:            10px;
+      --radius-sm:         6px;
+      --font-mono:         'JetBrains Mono', 'Fira Code', monospace;
+      --transition:        160ms ease;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--midnight-bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--midnight-accent2); text-decoration: none; }
+    code { font-family: var(--font-mono); font-size: 0.875em; }
+
+    /* Layout */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .app__header {
+      background: linear-gradient(135deg, #0d1626 0%, #1a0a3d 100%);
+      border-bottom: 1px solid var(--midnight-border);
+      padding: 2rem 1.5rem;
+    }
+    .app__header-inner { max-width: 760px; margin: 0 auto; }
+    .app__logo { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; }
+    .app__logo-icon { font-size: 1.8rem; }
+    .app__title {
+      font-size: 1.9rem; font-weight: 700;
+      background: linear-gradient(90deg, var(--midnight-accent), var(--midnight-accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .app__tagline { color: var(--text-secondary); font-size: 0.95rem; }
+
+    .app__main { flex: 1; max-width: 760px; margin: 0 auto; width: 100%; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .app__footer { border-top: 1px solid var(--midnight-border); padding: 1rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.6rem 1.25rem; border-radius: var(--radius-sm);
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      border: 1px solid transparent; transition: var(--transition); white-space: nowrap;
+    }
+    .btn--primary { background: var(--midnight-accent); color: #fff; border-color: var(--midnight-accent); }
+    .btn--primary:hover { filter: brightness(1.12); }
+    .btn--ghost { background: transparent; color: var(--text-secondary); border-color: var(--midnight-border); }
+    .btn--secondary { background: transparent; color: var(--midnight-accent); border-color: var(--midnight-accent); }
+    .btn--loading { opacity: 0.8; cursor: wait; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn__icon { font-size: 1.1em; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .spinner--sm { width: 14px; height: 14px; }
+
+    /* Wallet Connect */
+    .wallet-connect {
+      background: var(--midnight-card); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius); padding: 1.1rem 1.25rem;
+    }
+    .wallet-connect__disconnected { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .wallet-connect__hint { color: var(--text-secondary); font-size: 0.9rem; flex: 1; }
+    .wallet-connect__connecting { display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); }
+    .wallet-connect__connected { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+    .wallet-connect__address { display: flex; align-items: center; gap: 0.5rem; }
+    .wallet-connect__dot { color: var(--midnight-success); font-size: 0.7rem; }
+    .wallet-connect__label { color: var(--midnight-success); font-weight: 600; font-size: 0.85rem; }
+    .wallet-connect__addr-text {
+      background: rgba(124,92,252,0.12); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius-sm); padding: 0.2rem 0.6rem;
+      font-family: var(--font-mono); font-size: 0.8rem; color: var(--midnight-accent2);
+    }
+
+    /* Circuit Call */
+    .circuit-call {
+      background: var(--midnight-card); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .circuit-call__heading { font-size: 1.05rem; font-weight: 700; margin-bottom: 1.1rem; color: var(--text-primary); }
+    .circuit-call__selector { border: 1px solid var(--midnight-border); border-radius: var(--radius-sm); padding: 0.9rem 1rem; margin-bottom: 1rem; }
+    .circuit-call__selector-legend { font-size: 0.8rem; color: var(--text-secondary); padding: 0 0.4rem; font-weight: 600; }
+    .circuit-call__option { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+    .circuit-call__option small { color: var(--text-muted); }
+    .circuit-call__input-row { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .circuit-call__label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+    .circuit-call__input {
+      background: var(--midnight-surface); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius-sm); padding: 0.55rem 0.8rem; color: var(--text-primary);
+      font-size: 0.9rem; width: 100%; max-width: 220px;
+    }
+    .circuit-call__hint { font-size: 0.8rem; color: var(--text-muted); }
+    .circuit-call__submit { width: 100%; justify-content: center; padding: 0.75rem; font-size: 0.95rem; }
+    .circuit-call__loading-note {
+      margin-top: 0.75rem; padding: 0.65rem 1rem;
+      background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.2);
+      border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--midnight-warn);
+      text-align: center;
+    }
+    .circuit-call__result {
+      margin-top: 1rem; border-radius: var(--radius-sm); padding: 1rem;
+    }
+    .circuit-call__result--success { background: rgba(67,233,123,0.07); border: 1px solid rgba(67,233,123,0.25); }
+    .circuit-call__result-title { font-weight: 700; margin-bottom: 0.5rem; color: var(--midnight-success); }
+    .circuit-call__privacy-badge {
+      font-size: 0.85rem; color: var(--midnight-accent); font-weight: 600;
+      margin-bottom: 0.75rem; padding: 0.35rem 0.7rem;
+      background: rgba(124,92,252,0.1); border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+    .circuit-call__tx-details { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; font-size: 0.85rem; }
+    .circuit-call__tx-details dt { color: var(--text-secondary); }
+    .circuit-call__tx-details dd { color: var(--text-primary); }
+    .circuit-call__hash { color: var(--midnight-accent2); font-family: var(--font-mono); }
+    .circuit-call__result-note { margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-muted); }
+
+    /* Privacy Card */
+    .privacy-card {
+      background: var(--midnight-card); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .privacy-card__heading { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+    .privacy-card__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .privacy-card__col-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .privacy-card__col-title--public { color: #ffd166; }
+    .privacy-card__col-title--private { color: var(--midnight-accent2); }
+    .privacy-card__list { list-style: none; color: var(--text-secondary); font-size: 0.88rem; }
+    .privacy-card__list li::before { content: '• '; color: var(--text-muted); }
+    .privacy-card__claim { font-size: 0.88rem; color: var(--text-secondary); border-top: 1px solid var(--midnight-border); padding-top: 0.75rem; }
+
+    /* Contract Card */
+    .contract-card {
+      background: var(--midnight-card); border: 1px solid var(--midnight-border);
+      border-radius: var(--radius); padding: 1.5rem;
+    }
+    .contract-card__heading { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .contract-card__details { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1rem; font-size: 0.88rem; }
+    .contract-card__details dt { color: var(--text-secondary); }
+    .contract-card__address { font-family: var(--font-mono); color: var(--midnight-accent2); word-break: break-all; }
+
+    /* Highlight pulse for demo */
+    @keyframes highlight-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(124,92,252,0); }
+      50% { box-shadow: 0 0 0 6px rgba(124,92,252,0.35); }
+    }
+    .demo-highlight {
+      outline: 2px solid var(--midnight-accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+      animation: highlight-pulse 1.5s ease-in-out 2;
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="root">
+  <!-- Header -->
+  <header class="app__header">
+    <div class="app__header-inner">
+      <div class="app__logo">
+        <span class="app__logo-icon" aria-hidden="true">🌙</span>
+        <h1 class="app__title">UmbraPay</h1>
+      </div>
+      <p class="app__tagline">Payroll that proves it is fair without revealing who earns what.</p>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="app__main">
+    <!-- Wallet section (starts disconnected) -->
+    <section aria-label="Wallet connection" class="wallet-connect" id="wallet-section">
+      <div class="wallet-connect__disconnected" id="wallet-disconnected">
+        <p class="wallet-connect__hint">Connect your Lace wallet to interact with the UmbraPay contract on Preprod.</p>
+        <button class="btn btn--primary" id="connect-btn" aria-label="Connect Lace wallet">
+          <span class="btn__icon">🔗</span>
+          Connect Lace Wallet
+        </button>
+      </div>
+      <div class="wallet-connect__connecting" id="wallet-connecting" style="display:none" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Connecting to Lace…</span>
+      </div>
+      <div class="wallet-connect__connected" id="wallet-connected" style="display:none">
+        <div class="wallet-connect__address">
+          <span class="wallet-connect__dot" aria-hidden="true">●</span>
+          <span class="wallet-connect__label">Connected</span>
+          <code class="wallet-connect__addr-text" id="wallet-addr-text">mn_addr_preprod1qmj3…h8st</code>
+        </div>
+        <button class="btn btn--ghost" id="disconnect-btn">Disconnect</button>
+      </div>
+    </section>
+
+    <!-- Circuit Call section -->
+    <section aria-label="Circuit call panel" class="circuit-call" id="circuit-section">
+      <h2 class="circuit-call__heading">Run a ZK Circuit</h2>
+
+      <fieldset class="circuit-call__selector" id="circuit-selector">
+        <legend class="circuit-call__selector-legend">Choose circuit</legend>
+        <label class="circuit-call__option">
+          <input type="radio" name="circuit" value="prove" checked>
+          <span><strong>proveAboveFloor</strong><small> — proves salary ≥ floor, publishes nothing on-chain</small></span>
+        </label>
+        <label class="circuit-call__option">
+          <input type="radio" name="circuit" id="commit-radio" value="commit">
+          <span><strong>commitPayout</strong><small> — settles a payout; updates aggregate and commitment on-chain</small></span>
+        </label>
+      </fieldset>
+
+      <div class="circuit-call__input-row">
+        <label for="salary-amount" class="circuit-call__label">Proof value (must exceed floor of 1000)</label>
+        <input id="salary-amount" type="number" min="1" value="2500" class="circuit-call__input">
+        <p class="circuit-call__hint">
+          Your private recipient identity and payment salt are generated fresh and <strong>never shown or stored</strong>.
+        </p>
+      </div>
+
+      <button class="btn btn--primary circuit-call__submit" id="submit-btn" disabled>
+        <span class="btn__icon">🔒</span>
+        Prove &amp; Submit
+      </button>
+
+      <!-- Loading note (hidden initially) -->
+      <p class="circuit-call__loading-note" id="loading-note" style="display:none" role="status"></p>
+
+      <!-- Result (hidden initially) -->
+      <div class="circuit-call__result circuit-call__result--success" id="result-box" style="display:none" role="status">
+        <p class="circuit-call__result-title">✅ Proof accepted on-chain</p>
+        <p class="circuit-call__privacy-badge" id="privacy-badge">🔒 Proved without revealing your input</p>
+        <dl class="circuit-call__tx-details">
+          <dt>Circuit</dt><dd><code id="result-circuit">commitPayout</code></dd>
+          <dt>Transaction</dt><dd><code class="circuit-call__hash" id="result-tx">006721866736…4fc0c</code></dd>
+          <dt>Block</dt><dd id="result-block">2,669,762</dd>
+        </dl>
+        <p class="circuit-call__result-note" id="result-note"></p>
+      </div>
+
+      <p class="circuit-call__not-connected" id="not-connected-hint" style="display:none">
+        Connect your wallet above to enable circuit calls.
+      </p>
+    </section>
+
+    <!-- Privacy Model card -->
+    <section aria-label="Privacy model" class="privacy-card">
+      <h2 class="privacy-card__heading">Privacy Model</h2>
+      <div class="privacy-card__grid">
+        <div class="privacy-card__col">
+          <h3 class="privacy-card__col-title privacy-card__col-title--public">🔓 PUBLIC — visible on-chain</h3>
+          <ul class="privacy-card__list">
+            <li>Payroll round counter</li>
+            <li>Total disbursed (aggregate)</li>
+            <li>Minimum wage floor</li>
+            <li>Payout commitment hash</li>
+          </ul>
+        </div>
+        <div class="privacy-card__col">
+          <h3 class="privacy-card__col-title privacy-card__col-title--private">🔒 PRIVATE — never on-chain</h3>
+          <ul class="privacy-card__list">
+            <li>Individual salary amount</li>
+            <li>Recipient identity</li>
+            <li>Per-payment salt</li>
+          </ul>
+        </div>
+      </div>
+      <p class="privacy-card__claim">
+        <strong>Privacy Claim:</strong> An on-chain observer sees that a payout happened, that it cleared the floor,
+        and what the aggregate moved to. They cannot determine the individual salary, who received it, or link two
+        payouts to the same person. Private inputs are proven locally in your browser and are never transmitted.
+      </p>
+    </section>
+
+    <!-- Contract card -->
+    <section aria-label="Contract information" class="contract-card">
+      <h2 class="contract-card__heading">Live Contract — Preprod</h2>
+      <dl class="contract-card__details">
+        <dt>Network</dt><dd>Midnight Preprod</dd>
+        <dt>Contract address</dt>
+        <dd><code class="contract-card__address">14f9ade83ce4f188662767edb3a5607d6f43e67d6c09d84fd8932b82dcdf07f3</code></dd>
+      </dl>
+    </section>
+  </main>
+
+  <footer class="app__footer">
+    <p>UmbraPay — built on <a href="https://midnight.network" target="_blank">Midnight</a> for the Midnight Builder Challenge</p>
+  </footer>
+</div>
+
+<script>
+// ============================================================================
+// Demo orchestration — mirrors the real React state machine exactly
+// ============================================================================
+
+const WALLET_ADDR = 'mn_addr_preprod1qmj3wfykapy3c0zvuxgplh78qg993xuhn00v3fe86srtce9qzt7s2gh8st';
+const TX_HASH    = '006721866736564b812782fbb227ea0ecc70b076d60754e9f6570cd25d9064fc0c';
+const BLOCK      = '2,669,762';
+
+// State
+let connected = false;
+
+// Elements
+const walletDisconnected = document.getElementById('wallet-disconnected');
+const walletConnecting   = document.getElementById('wallet-connecting');
+const walletConnected    = document.getElementById('wallet-connected');
+const walletAddrText     = document.getElementById('wallet-addr-text');
+const connectBtn         = document.getElementById('connect-btn');
+const disconnectBtn      = document.getElementById('disconnect-btn');
+const submitBtn          = document.getElementById('submit-btn');
+const loadingNote        = document.getElementById('loading-note');
+const resultBox          = document.getElementById('result-box');
+const resultCircuit      = document.getElementById('result-circuit');
+const resultTx           = document.getElementById('result-tx');
+const resultBlock        = document.getElementById('result-block');
+const resultNote         = document.getElementById('result-note');
+const privacyBadge       = document.getElementById('privacy-badge');
+const notConnectedHint   = document.getElementById('not-connected-hint');
+
+function show(...els) { els.forEach(e => e.style.display = ''); }
+function hide(...els) { els.forEach(e => e.style.display = 'none'); }
+
+// Wallet connect handler
+connectBtn.addEventListener('click', () => {
+  hide(walletDisconnected);
+  show(walletConnecting);
+
+  // Simulate ~1.5s connection delay
+  setTimeout(() => {
+    hide(walletConnecting);
+    // Show address badge
+    const short = WALLET_ADDR.slice(0, 17) + '…' + WALLET_ADDR.slice(-4);
+    walletAddrText.textContent = short;
+    show(walletConnected);
+    connected = true;
+    submitBtn.disabled = false;
+    hide(notConnectedHint);
+  }, 1500);
+});
+
+disconnectBtn.addEventListener('click', () => {
+  connected = false;
+  hide(walletConnected, resultBox, loadingNote);
+  show(walletDisconnected);
+  submitBtn.disabled = true;
+  hide(notConnectedHint);
+});
+
+// Circuit submission
+submitBtn.addEventListener('click', () => {
+  const circuitVal = document.querySelector('input[name="circuit"]:checked').value;
+  const circuitName = circuitVal === 'commit' ? 'commitPayout' : 'proveAboveFloor';
+
+  submitBtn.disabled = true;
+  submitBtn.classList.add('btn--loading');
+  submitBtn.innerHTML = '<span class="spinner spinner--sm" aria-hidden="true"></span> Generating proof…';
+  hide(resultBox);
+
+  // Step 1 — proving
+  loadingNote.textContent = '⏳ Generating ZK proof locally in your browser — this may take a few seconds.';
+  show(loadingNote);
+
+  setTimeout(() => {
+    // Step 2 — submitting
+    submitBtn.innerHTML = '<span class="spinner spinner--sm" aria-hidden="true"></span> Submitting…';
+    loadingNote.textContent = '📡 Submitting proof to the Preprod network…';
+
+    setTimeout(() => {
+      // Step 3 — done
+      hide(loadingNote);
+      submitBtn.classList.remove('btn--loading');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span class="btn__icon">🔒</span> Prove &amp; Submit';
+
+      // Populate result
+      resultCircuit.textContent = circuitName;
+      resultTx.textContent = TX_HASH.slice(0, 10) + '…' + TX_HASH.slice(-5);
+      resultBlock.textContent = BLOCK;
+
+      if (circuitName === 'commitPayout') {
+        resultNote.innerHTML = 'The on-chain aggregate and round counter advanced. Your salary and recipient identity remain private.';
+      } else {
+        resultNote.innerHTML = 'This transaction published <strong>nothing</strong> — no amount, no identity, no salt. The ledger is byte-for-byte identical to before.';
+      }
+      show(resultBox);
+    }, 2500);
+  }, 3500);
+});
+
+// Initial state — show not-connected hint
+show(notConnectedHint);
+</script>
+</body>
+</html>

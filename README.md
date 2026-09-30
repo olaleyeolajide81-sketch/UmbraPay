@@ -13,32 +13,31 @@ identity stays on the payer's own device.
 
 ## Live Demo
 
-**🌐 Frontend (live):** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app)
+| Hosting | URL |
+|---------|-----|
+| **Vercel (primary)** | [https://umbrapay.vercel.app](https://umbrapay.vercel.app) |
+| Netlify (backup) | [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) |
 
 The frontend connects directly to the deployed Preprod contract at address
 `14f9…7f3`. Connect your Lace wallet, switch it to Preprod, and run either
 circuit.
 
-### Deploy your own copy to Vercel
+### Vercel deployment
 
 The project ships a `vercel.json` at the repo root and a GitHub Actions workflow at
-`.github/workflows/deploy-vercel.yml`. To enable the workflow:
+`.github/workflows/deploy-vercel.yml`.
 
-1. Go to [vercel.com/account/tokens](https://vercel.com/account/tokens) → create a token.
-2. Run `npx vercel link` in the project root (logged in) to generate `.vercel/project.json`.
-3. Add three secrets to your GitHub repo (`Settings → Secrets → Actions`):
+**Auto-deploy on push** — add these secrets to `Settings → Secrets → Actions`:
 
 | Secret | Where to find it |
 |--------|-----------------|
 | `VERCEL_TOKEN` | Vercel → Account → Tokens |
-| `VERCEL_ORG_ID` | `.vercel/project.json` → `orgId` |
-| `VERCEL_PROJECT_ID` | `.vercel/project.json` → `projectId` |
+| `VERCEL_ORG_ID` | `team_wC7WQUyyHz8gtCqtmSI7lFgv` |
+| `VERCEL_PROJECT_ID` | `prj_1CXdcMOBwhZL9iw9ANA769XZz3mB` |
 
-4. Push to `main` — the workflow deploys automatically.
-
-Or deploy manually in one command:
+Or deploy manually:
 ```bash
-vercel --prod
+vercel --token <your-token> --prod
 ```
 
 ---
@@ -54,7 +53,7 @@ vercel --prod
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
 | On-chain interaction | ✅ Exercised against both live deployments (Preview and Preprod) — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
 | Level 2 (frontend, wallet connect, circuit call) | ✅ Complete — React + Vite frontend, Lace wallet integration, live Preprod circuit calls |
-| Level 2 (live deployment) | ✅ Live at [coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) — Vercel deploy via `.github/workflows/deploy-vercel.yml` |
+| Level 2 (live deployment) | ✅ Live at [umbrapay.vercel.app](https://umbrapay.vercel.app) (Vercel primary) and [coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) (Netlify backup) |
 | Level 2 (demo video compliance) | ✅ All 4 checklist items implemented — wallet address badge, proof spinner, on-chain result, privacy badge — see [Demo Video](#demo-video) |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
@@ -337,7 +336,7 @@ npm run preview # preview the production build locally
 
 ## Demo Video
 
-**🌐 Live frontend for recording:** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app)
+**🌐 Live frontend for recording:** [https://umbrapay.vercel.app](https://umbrapay.vercel.app)
 
 [DEMO VIDEO LINK — record with the steps below and paste here]
 
@@ -369,20 +368,19 @@ The repo ships a Playwright-based recorder at `scripts/record-demo.mjs`:
 ```bash
 # Install Playwright and its Chromium browser if not already installed
 npx playwright install chromium
+npx playwright install-deps chromium
 
-# Start the frontend
-npm run dev
-
-# In a second terminal — record against localhost
+# Record against the self-contained mock page (no live server needed)
 node scripts/record-demo.mjs
 
 # Or record against the live deployment
-node scripts/record-demo.mjs https://coruscating-figolla-f21c7e.netlify.app
+node scripts/record-demo.mjs https://umbrapay.vercel.app
 ```
 
-Output: `demo-video.webm` in the project root. The script injects a mock wallet API to
-simulate the Lace extension in headless mode, so all four checklist moments are captured
-without requiring the extension to be installed.
+Output: `demo-video.webm` in the project root. The script drives `scripts/demo-mock-page.html` — a
+self-contained HTML page that faithfully replicates the production UmbraPay UI with a mocked wallet
+and circuit state machine. This lets headless Chromium capture all four checklist moments without
+requiring the Lace extension or the WASM proof stack.
 
 ---
 
