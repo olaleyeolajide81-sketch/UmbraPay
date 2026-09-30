@@ -63,8 +63,18 @@ export const PRIVATE_STATE_ID = 'umbraPayPrivateState';
 /**
  * The published minimum-wage floor, passed to the contract constructor.
  *
- * The constructor parameter is a private circuit input, so the contract
- * discloses it explicitly — this value becomes public, by design.
+ * The constructor parameter is a private circuit input in Compact, which means
+ * the compiler treats it like any other witness value. Publishing it as
+ * `payrollFloor` is therefore an explicit, intentional `disclose()` call in the
+ * contract source — not a silent leak. This value becomes a public ledger field
+ * that anyone can read; it is the policy constant an auditor verifies against.
+ *
+ * Override at deploy time:
+ * ```bash
+ * MIDNIGHT_PAYROLL_FLOOR=2500 npm run deploy -- --network preprod
+ * ```
+ *
+ * @default 1000
  */
 export const PAYROLL_FLOOR = BigInt(process.env.MIDNIGHT_PAYROLL_FLOOR?.trim() || '1000');
 
@@ -76,6 +86,21 @@ export const PAYROLL_FLOOR = BigInt(process.env.MIDNIGHT_PAYROLL_FLOOR?.trim() |
  * randomness per payment is what keeps two equal salaries unlinkable, so the
  * defaults are random rather than fixed: the same salary paid twice must not
  * produce the same commitment.
+ *
+ * Environment variables (all optional):
+ *
+ * | Variable | Purpose | Default |
+ * |---|---|---|
+ * | `MIDNIGHT_RECIPIENT_SECRET` | 64-hex-char (32-byte) recipient identity | random |
+ * | `MIDNIGHT_PAYMENT_SALT` | 64-hex-char (32-byte) per-payment salt | random |
+ *
+ * Pin these only when you need reproducible output (e.g. test fixtures). In
+ * production both values should be freshly generated for every payment. Using
+ * a fixed salt across multiple payouts to the same recipient makes those
+ * commitments linkable.
+ *
+ * @param salaryAmount - The individual's salary (bigint, tNIGHT units).
+ * @returns An {@link UmbraPayPrivateState} ready to pass to the witness set.
  */
 export function makePrivateState(salaryAmount: bigint): UmbraPayPrivateState {
   const secretHex = process.env.MIDNIGHT_RECIPIENT_SECRET?.trim();
