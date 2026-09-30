@@ -58,6 +58,32 @@ export async function waitForProofServer(
 
 // ─── Providers ────────────────────────────────────────────────────────────────
 
+/**
+ * Build the full provider set required by midnight-js deploy and interact scripts.
+ *
+ * Both `deploy.ts` and `interact.ts` call this function rather than each
+ * constructing their own providers. A fix here — to retry logic, timeout
+ * values, or WebSocket configuration — lands in both without duplication.
+ *
+ * The five providers returned:
+ *
+ * | Provider | Purpose |
+ * |---|---|
+ * | `privateStateProvider` | Stores and loads `UmbraPayPrivateState` in a local LevelDB, encrypted with `privateStatePassword`. Never touches the chain. |
+ * | `publicDataProvider` | Reads public contract state from the Midnight indexer over HTTP+WS. Used to fetch the current ledger before a circuit call. |
+ * | `zkConfigProvider` | Loads the prover and verifier keys from `managed/counter/keys/`. |
+ * | `proofProvider` | Sends circuits to the local proof server (Docker, port 6300) and gets back serialised proofs. |
+ * | `walletProvider` / `midnightProvider` | Balances, finalises, and submits transactions through the Midnight wallet. |
+ *
+ * Environment variables:
+ *
+ * | Variable | Purpose | Default |
+ * |---|---|---|
+ * | `PRIVATE_STATE_PASSWORD` | Encryption key for the LevelDB private-state store. Must be ≥ 16 characters. | `'Local-Devnet-Development-Placeholder-1'` |
+ *
+ * @param walletCtx - Wallet context returned by {@link buildWalletContext}.
+ * @param networkConfig - Network configuration (indexer URL, proof server URL, etc.).
+ */
 export async function createProviders(walletCtx: WalletContext, networkConfig: NetworkConfig) {
   // The SDK requires the private-state password to be at least 16 characters.
   const privateStatePassword =
@@ -98,6 +124,31 @@ export async function createProviders(walletCtx: WalletContext, networkConfig: N
 //
 // DUST is the non-transferable fee resource. A transaction with no DUST cannot
 // be submitted, so both scripts wait here before doing anything on-chain.
+
+/**
+ * Ensure the wallet has DUST before attempting any on-chain transaction.
+ *
+ * DUST is the Midnight fee resource. It is non-transferable and is generated
+ * by registering NIGHT UTXOs with the protocol. The sequence is:
+ *
+ * 1. If any unshielded NIGHT UTXOs are not yet registered for DUST generation,
+ *    register them now (one transaction).
+ * 2. If the DUST balance is still zero after registration, poll until DUST
+ *    accrues or the timeout expires.
+ *
+ * DUST accrual is observed through the indexer, so a recovering indexer can
+ * legitimately delay the observation even if DUST is already on-chain. Set
+ * `MIDNIGHT_DUST_TIMEOUT_MS` to a larger value if the network is degraded.
+ *
+ * Exit conditions:
+ * - Returns normally when DUST is available.
+ * - Prints a diagnostic and calls `process.exit(1)` if DUST never arrives
+ *   within the timeout. The diagnostic explains the three most common causes:
+ *   Docker not running, wallet holds no NIGHT, faucet has not landed yet.
+ *
+ * @param walletCtx - Wallet context with a synced wallet.
+ * @param network - The active network ID, used to tailor the diagnostic message.
+ */
 
 export async function ensureDust(
   walletCtx: WalletContext,
