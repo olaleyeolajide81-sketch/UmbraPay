@@ -116,10 +116,64 @@ export class UmbraPaySimulator {
    * Swap in a different employee's private payroll record.
    *
    * Models advancing to the next recipient: the public ledger carries over
-   * untouched while the private inputs change underneath it.
+   * untouched while the private inputs change underneath it. This is what a
+   * real multi-recipient payroll does — each employee supplies their own private
+   * record to the prover, and the public aggregate accumulates across all of them.
+   *
+   * @example
+   * ```ts
+   * const sim = await UmbraPaySimulator.create({ floor: 1000n, ... });
+   * await sim.commitPayout();                        // recipient A
+   * sim.setPrivateState({ salaryAmount: 2000n, ... }); // switch to recipient B
+   * await sim.commitPayout();                        // recipient B
+   * ```
    */
   public setPrivateState(next: UmbraPayPrivateState): void {
     this.#circuitContext = { ...this.#circuitContext, currentPrivateState: next };
+  }
+
+  /**
+   * Reset the simulator to a freshly-deployed state.
+   *
+   * Re-runs the constructor with the same `floor` that was passed to
+   * {@link create}, then restores the given private state (or the original
+   * private state if none is supplied). The public ledger returns to its
+   * genesis values: `payrollRound = 1`, `totalDisbursed = 0`, and
+   * `lastPayoutCommitment = pad(32, "umbrapay:genesis")`.
+   *
+   * Useful in tests that need to verify initial state after verifying
+   * post-payout state without creating a second simulator instance.
+   *
+   * @param floor - The payroll floor to re-deploy with. Defaults to the current
+   *   `payrollFloor` from the ledger.
+   * @param nextPrivateState - The private state to load after reset. Defaults
+   *   to the simulator's current private state.
+   */
+  public async reset(
+    floor?: bigint,
+    nextPrivateState?: UmbraPayPrivateState,
+  ): Promise<void> {
+    const resolvedFloor = floor ?? this.getLedger().payrollFloor;
+    const resolvedPrivate = nextPrivateState ?? this.getPrivateState();
+
+    const constructorContext: ConstructorContext<UmbraPayPrivateState> = createConstructorContext(
+      resolvedPrivate,
+      COIN_PUBLIC_KEY,
+    );
+
+    const { currentPrivateState, currentContractState, currentZswapLocalState } =
+      this.contract.initialState(constructorContext, resolvedFloor);
+
+    this.#circuitContext = createCircuitContext(
+      sampleContractAddress(),
+      currentZswapLocalState.coinPublicKey,
+      currentContractState.data,
+      currentPrivateState,
+    );
+
+    if (nextPrivateState) {
+      this.setPrivateState(nextPrivateState);
+    }
   }
 
   /** Settle one payout. Returns the disclosed commitment and the resulting ledger. */
