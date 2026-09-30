@@ -1,5 +1,13 @@
 {
+  // Node-side configuration: the deploy/interact CLIs in src/, the test suite,
+  // and the compiled contract's type declarations.
+  //
+  // The browser app (React components, hooks and browser-only lib modules) is
+  // deliberately excluded here and typechecked by tsconfig.app.json instead —
+  // it needs the DOM lib and the JSX transform, neither of which belong in a
+  // Node CLI's typecheck.
   "include": ["tests/**/*.ts", "src/**/*.ts", "managed/**/*.ts"],
+  "exclude": ["src/components", "src/hooks", "src/lib", "src/App.tsx", "src/main.tsx"],
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -15,3 +23,4 @@
     "noEmit": true
   }
 }
+

@@ -1,0 +1,416 @@
+/* ============================================================================
+   UmbraPay — global styles
+   ============================================================================ */
+
+/* ── CSS reset & base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --midnight-bg:       #0a0e1a;
+  --midnight-surface:  #111829;
+  --midnight-card:     #161e30;
+  --midnight-border:   #1e2d4a;
+  --midnight-accent:   #7c5cfc;
+  --midnight-accent2:  #4fc3f7;
+  --midnight-success:  #43e97b;
+  --midnight-error:    #ff6b6b;
+  --midnight-warn:     #ffd166;
+  --text-primary:      #e8edf5;
+  --text-secondary:    #8b9ab5;
+  --text-muted:        #4a5568;
+  --radius:            10px;
+  --radius-sm:         6px;
+  --font-mono:         'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --transition:        160ms ease;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--midnight-bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--midnight-accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app__header {
+  background: linear-gradient(135deg, #0d1626 0%, #1a0a3d 100%);
+  border-bottom: 1px solid var(--midnight-border);
+  padding: 2rem 1.5rem;
+}
+
+.app__header-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.app__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.app__logo-icon { font-size: 1.8rem; }
+
+.app__title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--midnight-accent), var(--midnight-accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app__tagline { color: var(--text-secondary); font-size: 0.95rem; }
+
+.app__main {
+  flex: 1;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.app__footer {
+  border-top: 1px solid var(--midnight-border);
+  padding: 1rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── Shared card base ─────────────────────────────────────────────────────── */
+.wallet-connect,
+.circuit-call,
+.privacy-card,
+.contract-card {
+  background: var(--midnight-card);
+  border: 1px solid var(--midnight-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--transition), opacity var(--transition);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--midnight-accent);
+  color: #fff;
+  border-color: var(--midnight-accent);
+}
+.btn--primary:hover:not(:disabled) { background: #6a4be0; }
+
+.btn--secondary {
+  background: transparent;
+  color: var(--midnight-accent);
+  border-color: var(--midnight-accent);
+}
+.btn--secondary:hover:not(:disabled) { background: rgba(124, 92, 252, 0.12); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--midnight-border);
+}
+.btn--ghost:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
+
+.btn--loading { pointer-events: none; }
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.spinner {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner--sm {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+/* ── WalletConnect ────────────────────────────────────────────────────────── */
+.wallet-connect__disconnected,
+.wallet-connect__connecting,
+.wallet-connect__connected,
+.wallet-connect__error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.wallet-connect__hint {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.wallet-connect__connected {
+  justify-content: space-between;
+}
+
+.wallet-connect__address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.wallet-connect__dot { color: var(--midnight-success); font-size: 0.7rem; }
+.wallet-connect__label { color: var(--midnight-success); font-size: 0.85rem; font-weight: 600; }
+
+.wallet-connect__addr-text {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--midnight-border);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.wallet-connect__error-icon { font-size: 1.1rem; flex-shrink: 0; }
+.wallet-connect__error-msg { color: var(--midnight-error); font-size: 0.9rem; flex: 1; }
+
+/* ── CircuitCall ──────────────────────────────────────────────────────────── */
+.circuit-call__heading {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.circuit-call__selector {
+  border: 1px solid var(--midnight-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.circuit-call__selector-legend {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.circuit-call__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  cursor: pointer;
+}
+
+.circuit-call__option input { margin-top: 0.25rem; accent-color: var(--midnight-accent); }
+
+.circuit-call__option strong { color: var(--midnight-accent2); }
+.circuit-call__option small { color: var(--text-secondary); }
+
+.circuit-call__input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.circuit-call__label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.circuit-call__input {
+  background: var(--midnight-surface);
+  border: 1px solid var(--midnight-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  transition: border-color var(--transition);
+}
+.circuit-call__input:focus { outline: none; border-color: var(--midnight-accent); }
+.circuit-call__input--error { border-color: var(--midnight-error); }
+.circuit-call__input:disabled { opacity: 0.5; }
+
+.circuit-call__hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.circuit-call__submit { width: 100%; justify-content: center; padding: 0.7rem 1rem; }
+
+.circuit-call__loading-note {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.circuit-call__result {
+  margin-top: 1rem;
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  border: 1px solid;
+}
+
+.circuit-call__result--success {
+  background: rgba(67, 233, 123, 0.07);
+  border-color: rgba(67, 233, 123, 0.3);
+}
+
+.circuit-call__result--error {
+  background: rgba(255, 107, 107, 0.07);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.circuit-call__result-title {
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.circuit-call__result-body { color: var(--midnight-error); font-size: 0.9rem; }
+
+.circuit-call__privacy-badge {
+  display: inline-block;
+  background: rgba(124, 92, 252, 0.15);
+  border: 1px solid rgba(124, 92, 252, 0.4);
+  color: var(--midnight-accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+.circuit-call__tx-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+.circuit-call__tx-details dt { color: var(--text-muted); }
+.circuit-call__tx-details dd { color: var(--text-primary); }
+
+.circuit-call__hash {
+  word-break: break-all;
+  font-size: 0.78rem;
+}
+
+.circuit-call__result-note {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.circuit-call__not-connected {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Privacy card ─────────────────────────────────────────────────────────── */
+.privacy-card__heading,
+.contract-card__heading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.privacy-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 520px) {
+  .privacy-card__grid { grid-template-columns: 1fr; }
+}
+
+.privacy-card__col-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.privacy-card__col-title--public { color: var(--midnight-warn); }
+.privacy-card__col-title--private { color: var(--midnight-success); }
+
+.privacy-card__list {
+  list-style: none;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.privacy-card__list li { padding: 0.15rem 0; }
+.privacy-card__list li::before { content: '• '; color: var(--text-muted); }
+
+.privacy-card__claim {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--midnight-border);
+  padding-top: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ── Contract card ────────────────────────────────────────────────────────── */
+.contract-card__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.88rem;
+}
+.contract-card__details dt { color: var(--text-muted); }
+.contract-card__details dd { color: var(--text-primary); }
+
+.contract-card__address {
+  font-size: 0.75rem;
+  word-break: break-all;
+  color: var(--midnight-accent2);
+}

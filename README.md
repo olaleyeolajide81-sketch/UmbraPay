@@ -11,6 +11,15 @@ identity stays on the payer's own device.
 
 ---
 
+## Live Demo
+
+> **Deploy this repo to Vercel** (one click or `vercel --prod` from the project root) and
+> paste the live URL here.
+
+[PASTE LIVE URL AFTER DEPLOYING FRONTEND]
+
+---
+
 ## Project Status
 
 | Piece | State |
@@ -21,7 +30,7 @@ identity stays on the payer's own device.
 | Contract address | ✅ Deployed on Preview (`8c17…a5c`) and Preprod (`14f9…7f3`), see [Contract Address](#contract-address) |
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
 | On-chain interaction | ✅ Exercised against both live deployments (Preview and Preprod) — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
-| Level 2 (frontend, decoy payouts, batched disclosure) | 🔭 Scoped, not built |
+| Level 2 (frontend, wallet connect, circuit call) | ✅ Complete — React + Vite frontend, Lace wallet integration, live Preprod circuit calls |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
 ---
@@ -157,6 +166,26 @@ batched disclosure windows.
 
 ---
 
+## Privacy Claim
+
+An on-chain observer watching the Preprod contract sees:
+- that a payout round occurred (the round counter incremented),
+- that the running total moved by *some* amount,
+- that the payer committed to a hash of `(amount, recipient, salt)`, and
+- that the proof verified against the published floor.
+
+They **cannot** determine:
+- what the individual salary was,
+- who the recipient is,
+- whether two payouts went to the same person (equal salaries produce different
+  commitments because each salt is freshly random), or
+- anything beyond the aggregate.
+
+Every private input is proved locally in the browser via the Midnight ZK proof server and
+is never transmitted to any server or stored in any log.
+
+---
+
 ## Tech Stack
 
 - **Midnight network** — Preview / Preprod testnets, or a local devnet
@@ -166,6 +195,9 @@ batched disclosure windows.
 - **Docker** — runs the proof server
 - **TypeScript + Vitest** — contract tests over `compact-runtime`
 - **midnight-js 4.1.1 + wallet-sdk 1.2.0** — deployment and wallet plumbing
+- **React 19 + Vite 7** — browser frontend
+- **Lace wallet** — DApp connector for Midnight (browser extension)
+- **@midnight-ntwrk/dapp-connector-api** — browser ↔ wallet bridge
 
 ---
 
@@ -178,6 +210,7 @@ batched disclosure windows.
 | Docker (with Compose v2) | any recent | `docker info` |
 | Compact devtools | 0.5.x | `compact --version` |
 | Compact toolchain | 0.31.1 | `compact compile --version` |
+| Lace wallet (browser) | latest | Install from [lace.io](https://www.lace.io/) |
 
 The **Compact compiler is not an npm package.** `npm install -g
 @midnight-ntwrk/compact-compiler` does not exist (404). Install the devtools, then let
@@ -244,6 +277,42 @@ managed/counter/
 `.mcp.json` wires the Midnight docs MCP server for Claude Code / Cursor users. Note that
 `https://midnight.mcp.kapa.ai` is **OAuth-protected** — it returns `401` until you
 authenticate through your client's MCP UI.
+
+---
+
+## Run Locally
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/olaleyeolajide81-sketch/UmbraPay
+cd UmbraPay
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the local dev server (automatically syncs ZK artifacts to public/zk/)
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in a Chromium-based browser with the
+Lace wallet extension installed and switched to **Preprod**.
+
+> **Note:** The frontend connects to the live Preprod deployment — no local proof server
+> or Docker daemon is needed for the frontend. Docker is only required if you want to
+> re-deploy the contract yourself.
+
+To build for production:
+
+```bash
+npm run build   # output in dist/
+npm run preview # preview the production build locally
+```
+
+---
+
+## Demo Video
+
+[PLACEHOLDER — I will add the link after recording]
 
 ---
 

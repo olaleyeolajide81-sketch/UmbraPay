@@ -1,0 +1,29 @@
+{
+  // Browser-side configuration: the React app, its hooks, and the browser-only
+  // Midnight integration in src/lib/. The Node CLI sources (src/deploy.ts and
+  // friends) are intentionally NOT included — they depend on node:* builtins
+  // that do not exist in the DOM lib.
+  "include": [
+    "src/components/**/*.tsx",
+    "src/hooks/**/*.ts",
+    "src/lib/**/*.ts",
+    "src/App.tsx",
+    "src/main.tsx",
+    "src/witnesses.ts"
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
+  }
+}
