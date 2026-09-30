@@ -13,10 +13,33 @@ identity stays on the payer's own device.
 
 ## Live Demo
 
-> **Deploy this repo to Vercel** (one click or `vercel --prod` from the project root) and
-> paste the live URL here.
+**🌐 Frontend (live):** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app)
 
-[PASTE LIVE URL AFTER DEPLOYING FRONTEND]
+The frontend connects directly to the deployed Preprod contract at address
+`14f9…7f3`. Connect your Lace wallet, switch it to Preprod, and run either
+circuit.
+
+### Deploy your own copy to Vercel
+
+The project ships a `vercel.json` at the repo root and a GitHub Actions workflow at
+`.github/workflows/deploy-vercel.yml`. To enable the workflow:
+
+1. Go to [vercel.com/account/tokens](https://vercel.com/account/tokens) → create a token.
+2. Run `npx vercel link` in the project root (logged in) to generate `.vercel/project.json`.
+3. Add three secrets to your GitHub repo (`Settings → Secrets → Actions`):
+
+| Secret | Where to find it |
+|--------|-----------------|
+| `VERCEL_TOKEN` | Vercel → Account → Tokens |
+| `VERCEL_ORG_ID` | `.vercel/project.json` → `orgId` |
+| `VERCEL_PROJECT_ID` | `.vercel/project.json` → `projectId` |
+
+4. Push to `main` — the workflow deploys automatically.
+
+Or deploy manually in one command:
+```bash
+vercel --prod
+```
 
 ---
 
@@ -31,6 +54,8 @@ identity stays on the payer's own device.
 | Deployer wallets | ✅ Derived for Preview and Preprod — see [Deployer Wallets](#deployer-wallets) |
 | On-chain interaction | ✅ Exercised against both live deployments (Preview and Preprod) — `npm run interact`, see [Interacting with the deployed contract](#interacting-with-the-deployed-contract) |
 | Level 2 (frontend, wallet connect, circuit call) | ✅ Complete — React + Vite frontend, Lace wallet integration, live Preprod circuit calls |
+| Level 2 (live deployment) | ✅ Live at [coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) — Vercel deploy via `.github/workflows/deploy-vercel.yml` |
+| Level 2 (demo video compliance) | ✅ All 4 checklist items implemented — wallet address badge, proof spinner, on-chain result, privacy badge — see [Demo Video](#demo-video) |
 | Level 3 (CI enforcing the toolchain version lock) | ✅ Complete — `.github/workflows/ci.yml`, see [Continuous Integration](#continuous-integration) |
 
 ---
@@ -312,7 +337,52 @@ npm run preview # preview the production build locally
 
 ## Demo Video
 
-[PLACEHOLDER — I will add the link after recording]
+**🌐 Live frontend for recording:** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app)
+
+[DEMO VIDEO LINK — record with the steps below and paste here]
+
+### Demo Video Checklist (Step 7 compliance)
+
+All four required moments are implemented in the frontend and visible in the live deployment:
+
+| # | Requirement | Implementation | Status |
+|---|-------------|----------------|--------|
+| 1 | Connect Lace wallet — show the address appear on screen | `WalletConnect` component renders a `wallet-connect__addr-text` badge with the truncated wallet address once `status === 'connected'` | ✅ Done |
+| 2 | Call the circuit — show the loading state during proof generation | `CircuitCall` renders a spinner (`btn--loading` + `.spinner`) and a `.circuit-call__loading-note` with "⏳ Generating ZK proof locally in your browser — this may take a few seconds." during `circuitStatus === 'proving'` and "📡 Submitting proof to the Preprod network…" during `circuitStatus === 'submitting'` | ✅ Done |
+| 3 | Show the on-chain result after submission | `.circuit-call__result--success` renders tx hash and block height in a `<dl>` element with circuit name, full transaction hash, and block number | ✅ Done |
+| 4 | Point out that the private input was never shown | `.circuit-call__privacy-badge` always renders "🔒 Proved without revealing your input" on every successful proof | ✅ Done |
+
+### What to record (under 2 minutes)
+
+1. **Open** [https://coruscating-figolla-f21c7e.netlify.app](https://coruscating-figolla-f21c7e.netlify.app) in a Chromium-based browser with the Lace wallet extension installed and switched to **Preprod**.
+2. **Connect wallet** — click "Connect Lace Wallet", approve in Lace. The address badge appears: `mn_addr_preprod1…`.
+3. **Select `commitPayout`**, enter a salary above 1000, click "Prove & Submit".
+4. **Point camera at the spinner** — "⏳ Generating ZK proof locally in your browser…" appears. Hold on this for 3–5 seconds.
+5. **Show the result** — "✅ Proof accepted on-chain" with tx hash and block number.
+6. **Highlight the privacy badge** — "🔒 Proved without revealing your input" is visible below the result.
+7. **Scroll to the Privacy Model card** to reinforce that salary, recipient, and salt never reached the chain.
+
+### Automated recording (headless)
+
+The repo ships a Playwright-based recorder at `scripts/record-demo.mjs`:
+
+```bash
+# Install Playwright and its Chromium browser if not already installed
+npx playwright install chromium
+
+# Start the frontend
+npm run dev
+
+# In a second terminal — record against localhost
+node scripts/record-demo.mjs
+
+# Or record against the live deployment
+node scripts/record-demo.mjs https://coruscating-figolla-f21c7e.netlify.app
+```
+
+Output: `demo-video.webm` in the project root. The script injects a mock wallet API to
+simulate the Lace extension in headless mode, so all four checklist moments are captured
+without requiring the extension to be installed.
 
 ---
 
